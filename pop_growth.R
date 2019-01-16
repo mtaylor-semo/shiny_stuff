@@ -5,15 +5,20 @@ library(miniUI)
 ui <- miniPage(
   gadgetTitleBar("Population Growth"),
     miniTabstripPanel("Intrinsic Rate", icon = icon("sliders"),
-                miniContentPanel(
-                  plotOutput("distPlot", 
-                             height = "50%")),
-                miniContentPanel(
-                  sliderInput("pop_r", "(r)", 0, 1, 0.5)
-                )
+                      fillCol(
+                        miniContentPanel(
+                          plotOutput("distPlot", 
+                                     height = "100%")),
+                        miniContentPanel(
+                          sliderInput("pop_r", 
+                                      "Intrinsic Growth Rate (r)", 
+                                      min = 0, 
+                                      max = 1, 
+                                      value = 0.5)
+                        ), height = "100%")
     )
 )
- 
+
 # Define server logic required to draw a histogram ----
 server <- function(input, output, session) {
   
