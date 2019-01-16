@@ -1,48 +1,21 @@
 library(shiny)
+library(miniUI)
 
 # Define UI for app that draws a histogram ----
-ui <- fluidPage(
-  
-  # App title ----
-  titlePanel("Population Growth"),
-  
-  # Sidebar layout with input and output definitions ----
-  sidebarLayout(
-    
-    # Sidebar panel for inputs ----
-    sidebarPanel(
-      
-      print("Slide the bar to set population size"),
-      print("\n\n"),
-      # Input: Slider for the number of bins ----
-      sliderInput(inputId = "capacity",
-                  label = "Starting Population Size (N)",
-                  min = 100,
-                  max = 2000,
-                  value = 1000),
-      
-
-    print("Slide the bar to set intrinsic \n"),
-    print("rate of population growth."),
-    sliderInput(inputId = "pop_r",
-                label = "Intrinsic Rate (r)",
-                min = 0,
-                max = 1,
-                value = 0.5)
-    ),
-  
-    # Main panel for displaying outputs ----
-    mainPanel(
-      
-      # Output: Histogram ----
-      plotOutput(outputId = "distPlot")
-      
+ui <- miniPage(
+  gadgetTitleBar("Population Growth"),
+    miniTabstripPanel("Intrinsic Rate", icon = icon("sliders"),
+                miniContentPanel(
+                  plotOutput("distPlot", 
+                             height = "50%")),
+                miniContentPanel(
+                  sliderInput("pop_r", "(r)", 0, 1, 0.5)
+                )
     )
-  )
 )
-
+ 
 # Define server logic required to draw a histogram ----
-server <- function(input, output) {
+server <- function(input, output, session) {
   
   # Histogram of the Old Faithful Geyser Data ----
   # with requested number of bins
@@ -54,8 +27,9 @@ server <- function(input, output) {
   # 2. Its output type is a plot
   output$distPlot <- renderPlot({
     
-    K <- input$capacity
+    K <- 100 # input$capacity
     r <- input$pop_r
+#    N = 500
     gens <- 1:30
     N0 = 2
 #    pop_vec <- vector(mode="numeric", length = gens)
@@ -81,6 +55,9 @@ server <- function(input, output) {
     
   })
   
+  observeEvent(input$done, {
+    stopApp(TRUE)
+  })
 }
 
 shinyApp(ui = ui, server = server)
