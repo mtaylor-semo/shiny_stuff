@@ -117,7 +117,9 @@ server <- function(input, output) {
       coord_cartesian(ylim = c(0, 1)) +
       scale_y_continuous(breaks = seq(0, 1, by = 0.1)) +
       scale_color_brewer(type = "qual", palette = "Dark2") +
-      theme_classic()
+      theme_classic() +
+      scale_x_continuous(breaks = seq(0, input$num_gens, by = 500),
+                         expand = c(0,0))
   })
 
   }
