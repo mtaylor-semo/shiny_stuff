@@ -16,7 +16,7 @@ n = 24
 SD = round(sd(dat), 2)
 
 colors_has_mean <- c("Yes" = "gray80",
-                     "No" = "maroon")
+                     "No" = "black")
 # Define UI for application that draws a histogram
 ui <- fluidPage(
    
