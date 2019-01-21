@@ -14,8 +14,8 @@ dat <- c(6.2, 6.6, 7.1, 7.4, 7.6, 7.9,
 
 
 n.draw = 100
-mu = 9
-n = 24
+mu = 9.0
+#n = 24
 SD = round(sd(dat), 2)
 
 colors_has_mean <- c("Yes" = "gray80",
