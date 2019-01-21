@@ -83,12 +83,14 @@ server <- function(input, output) {
              "high" =`2`) %>% 
       mutate(run = str_remove_all(run, pattern = "V"),
              run = as.numeric(run)) %>% 
-      mutate(includes_zero = ifelse(low > mu | high < mu, "No", "Yes")) %>% 
+      mutate(includes_mean = ifelse(low > mu | high < mu, "No", "Yes")) %>% 
       arrange(run)
     
   })
-    
+  
    output$intervalPlot <- renderPlot({
+     
+     num <-  sum(resample()$low > mu | resample()$high < mu)
      
        ggplot(resample(), aes(y = run)) +
        geom_vline(xintercept = mu,
@@ -96,7 +98,7 @@ server <- function(input, output) {
                   lty = 2) +
        geom_segment(aes(x = low, xend = high,
                         y = run, yend = run,
-                        color = includes_zero)) +
+                        color = includes_mean)) +
        theme_classic() +
        scale_color_manual(values = colors_has_mean,
                           name = "Includes Mean?") +
@@ -105,10 +107,13 @@ server <- function(input, output) {
        theme(legend.position = "bottom",
              axis.title.y = element_text(angle = 0)) +
        scale_x_continuous(breaks = seq(7,11, by = 0.2)) +
-       scale_y_continuous(breaks = seq(0, 100, by = 20))
+       scale_y_continuous(breaks = seq(0, 100, by = 20)) +
+         ggtitle(paste(num, "samples do not include the population mean."))
    }, height = 600, unit = "px")
 }
 
 # Run the application 
 shinyApp(ui = ui, server = server)
+
+
 
