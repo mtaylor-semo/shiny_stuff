@@ -86,12 +86,12 @@ server <- function(input, output) {
   
   output$densityPlot <- renderPlot({
     
-    t_result <- tidy(t.test(height ~ group, 
+    t_test <- tidy(t.test(height ~ group, 
                             data = data_set(), 
                             var.equal = TRUE))
     
-    t_value <- round(abs(t_result$statistic), 2)
-    degrees_freedom <- round(t_result$parameter, 2)  
+    t_value <- round(abs(t_test$statistic), 2)
+    degrees_freedom <- round(t_test$parameter, 2)  
     
     ggplot(data_set()) + 
       geom_density(aes(x = height, 
@@ -99,16 +99,19 @@ server <- function(input, output) {
                    alpha = 0.5) +
       scale_x_continuous(limits = c(55,85), breaks = seq(55, 85, by = 5)) +
       scale_y_continuous(limits= c(0, 0.2)) +
-      geom_vline(xintercept = t_result$estimate1,
+      geom_vline(xintercept = t_test$estimate1,
                  color = mean_colors[1]) +
-      geom_vline(xintercept = t_result$estimate2,
+      geom_vline(xintercept = t_test$estimate2,
                  color = mean_colors[2]) +
       scale_fill_brewer(palette = "Dark2") +
-      ggtitle(paste("t =", t_test, "with", degrees_freedom, "degrees of freedom"))
+      ggtitle(paste("t =", t_value, "with", degrees_freedom, "degrees of freedom"))
   })
 
   output$tPlot <- renderPlot({
-    ggplot(data = data.frame(x = 1:10, y = 1:10)) + geom_point(aes(x, y))
+    ggplot(t_test, aes(y = y_point)) +
+      stat_function(data = t_range, 
+                    aes(x = t),
+                    fun = dt, args = list(df = t_test$parameter))
   })  
   
 }
