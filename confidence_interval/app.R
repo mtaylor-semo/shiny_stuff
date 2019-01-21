@@ -108,7 +108,7 @@ server <- function(input, output) {
              axis.title.y = element_text(angle = 0)) +
        scale_x_continuous(breaks = seq(7,11, by = 0.2)) +
        scale_y_continuous(breaks = seq(0, 100, by = 20)) +
-         ggtitle(paste(num, "samples do not include the population mean."))
+         ggtitle(paste(num, "random samples do not include the population mean."))
    }, height = 600, unit = "px")
 }
 
