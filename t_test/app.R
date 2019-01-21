@@ -1,12 +1,15 @@
 #
-# 
-# 
+# Shiny app to show how student's t relates to the differerence
+# between the mean of two groups. 
 #
-# 
-#
+# One group has a fixed mean. The other mean is chosen by the user.
+# Sample size can also be chosen. 
 # 
 #
 
+# TO DO
+# Add instructions
+# Remove some redundancy? I think some rounding is redundant.
 
 # Libraries ---------------------------------------------------------------
 
