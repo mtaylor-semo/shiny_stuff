@@ -53,16 +53,16 @@ ui <- fluidPage(
 # Define server logic required to draw a histogram
 server <- function(input, output) {
   
-  output$regrPlot <- renderPlot({
+  regrData <- reactive({
+    pl <- rnorm(50, mean = mean_petal_length, sd = sd_petal_length)
+    error <- rnorm(length(pl), 0, input$stdev)
+    sl <- 2.41 + (input$slope * pl) + error
     
-    regrData <- reactive({
-      pl <- rnorm(50, mean = mean_petal_length, sd = sd_petal_length)
-      error <- rnorm(length(pl), 0, input$stdev)
-      sl <- 2.41 + (input$slope * pl) + error
-      
-      tibble(pl, sl)
-      
-    })
+    tibble(pl, sl)
+    
+  })
+  
+  output$regrPlot <- renderPlot({
     
     model <- summary(lm(sl ~ pl, data = regrData())) %>% glance()
     r2 <- round(model$r.squared, 2)
