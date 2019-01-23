@@ -7,6 +7,7 @@
 
 library(shiny)
 library(tidyverse)
+library(broom)
 
 set.seed(42)
 irs <- iris %>%
