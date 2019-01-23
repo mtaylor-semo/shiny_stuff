@@ -19,69 +19,66 @@ sd_petal_length <- sd(irs$Petal.Length)
 
 # Define UI for application that draws a histogram
 ui <- fluidPage(
-   
-   # Application title
-   titlePanel("Iris Regression"),
-   
-   # Choose standard error, default is actual sd
-   # of iris versicolor petal length
-   sidebarLayout(
-      sidebarPanel(
-        sliderInput("slope",
-                    "Value of beta:",
-                    min = -1,
-                    max = 1,
-                    value = 0.8,
-                    step = 0.05),
-        sliderInput("stdev",
-                     "Amount of error:",
-                     min = 0,
-                     max = 0.8,
-                     value = 0.34),
-         helpText("More error = more scatter"),
-         checkboxInput("showLM", "Show regression line?",
-                       value = TRUE)
-      ),
-      
-      # Show a plot of the generated distribution
-      mainPanel(
-         plotOutput("regrPlot")
-      )
-   )
+  
+  # Application title
+  titlePanel("Iris Regression"),
+  
+  # Choose standard error, default is actual sd
+  # of iris versicolor petal length
+  sidebarLayout(
+    sidebarPanel(
+      sliderInput("slope",
+                  "Value of beta:",
+                  min = -1,
+                  max = 1,
+                  value = 0.8,
+                  step = 0.05),
+      sliderInput("stdev",
+                  "Amount of error:",
+                  min = 0,
+                  max = 0.8,
+                  value = 0.34),
+      helpText("More error = more scatter"),
+      checkboxInput("showLM", "Show regression line?",
+                    value = TRUE)
+    ),
+    
+    # Show a plot of the generated distribution
+    mainPanel(
+      plotOutput("regrPlot")
+    )
+  )
 )
 
 # Define server logic required to draw a histogram
 server <- function(input, output) {
-   
-   output$regrPlot <- renderPlot({
-      # generate bins based on input$bins from ui.R
-     
-     regrData <- reactive({
-       pl <- rnorm(50, mean = mean_petal_length, sd = sd_petal_length)
-       error <- rnorm(length(pl), 0, input$stdev)
-#       sl <- 2.41 + (0.828 * pl) + error
-       sl <- 2.41 + (input$slope * pl) + error
-       
-       irs <- tibble(pl, sl)
-       
-       #model <- summary(lm(sl ~ pl, data = irs)) %>% glance()
-     })
-     # draw the regression
-     model <- summary(lm(sl ~ pl, data = regrData())) %>% glance()
-     r2 <- round(model$r.squared, 2)
-
+  
+  output$regrPlot <- renderPlot({
+    
+    regrData <- reactive({
+      pl <- rnorm(50, mean = mean_petal_length, sd = sd_petal_length)
+      error <- rnorm(length(pl), 0, input$stdev)
+      sl <- 2.41 + (input$slope * pl) + error
+      
+      tibble(pl, sl)
+      
+    })
+    
+    model <- summary(lm(sl ~ pl, data = regrData())) %>% glance()
+    r2 <- round(model$r.squared, 2)
+    
     cor_r <- round(cor(regrData()$sl, regrData()$pl), 2)
-     
-     p1 <- ggplot(data = regrData(), aes(x = pl, y = sl)) + 
-        geom_point() +
-        labs(title = paste("R^2 =", r2,". Correlation =", cor_r),
-             x = "Petal Length (cm)",
-             y = "Sepal Length (cm)")
-     
-     p2 <- {if (input$showLM) p1 + geom_smooth(method = "lm",
-                                          se = FALSE) else p1}
-     print(p2)
-   })
+    
+    p1 <- ggplot(data = regrData(), aes(x = pl, y = sl)) + 
+      geom_point() +
+      labs(title = paste("R^2 =", r2,". Correlation =", cor_r),
+           x = "Petal Length (cm)",
+           y = "Sepal Length (cm)")
+    
+    p2 <- {if (input$showLM) p1 + geom_smooth(method = "lm",
+                                              se = FALSE) else p1}
+    print(p2)
+  })
 }
 
 # Run the application 
