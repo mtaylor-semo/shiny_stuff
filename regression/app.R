@@ -62,6 +62,10 @@ server <- function(input, output) {
     
   })
   
+  fittedData <- reactive({
+    df <- lm(sl ~ pl, regrData()) %>% augment()
+  })
+  
   output$regrPlot <- renderPlot({
     
     model <- summary(lm(sl ~ pl, data = regrData())) %>% glance()
@@ -73,7 +77,12 @@ server <- function(input, output) {
       geom_point() +
       labs(title = paste("R^2 =", r2,". Correlation =", cor_r),
            x = "Petal Length (cm)",
-           y = "Sepal Length (cm)")
+           y = "Sepal Length (cm)") +
+      geom_segment(data = fittedData(),
+                   aes(xend = pl, yend = .fitted), alpha = .2) +
+      # Add a "Show fitted points" checkbox.
+      geom_point(data = fittedData(),
+                 aes(y = .fitted), shape = 1)
     
     p2 <- {if (input$showLM) p1 + geom_smooth(method = "lm",
                                               se = FALSE) else p1}
