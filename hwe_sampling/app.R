@@ -132,7 +132,7 @@ server <- function(input, output) {
         p_vec[i] <- p
       }
       
-      data.frame(p = p_vec, 
+      data_frame(p = p_vec, 
                  p2 = g_freq[, 1],
                  pq2 = g_freq[, 2],
                  q2 = g_freq[, 3])
@@ -175,9 +175,8 @@ server <- function(input, output) {
     freq <- input$p_freq
     N <- input$pop_size
     
-    
-    df <- data.frame(genotype <- factor(genos, levels = genos, ordered = TRUE),
-                     freqs = c(freq^2, 2 * freq * (1-freq), (1 - freq)^2))
+    df <- data_frame(genotype = factor(genos, levels = genos, ordered = TRUE),
+                    freqs = c(freq^2, 2 * freq * (1-freq), (1 - freq)^2))
 
     sampled <- sample_pop() %>% 
       filter(p >= freq - 0.05 & p <= freq + 0.05) %>% 
