@@ -10,11 +10,11 @@ library(shiny)
 library(ggplot2)
 library(dplyr)
 
-cols <-RColorBrewer::brewer.pal(3,"Dark2")
-names(cols) <- c("p2", "2pq", "q2")
-
 alleles <- c('A', 'a')
 genos <- c("p2", "2pq", "q2")
+cols <-RColorBrewer::brewer.pal(3,"Dark2")
+#names(cols) <- c("p2", "2pq", "q2")
+names(cols) <- genos
 
 
 
