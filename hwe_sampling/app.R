@@ -195,15 +195,16 @@ server <- function(input, output) {
                      y = freqs,
                      color = genotype),
                  alpha = 0.5) +
-      geom_point(aes(fill = genotype),
-                 size = 3,
-                 shape = 21) +
+      geom_point(aes(fill = genotype,
+                     shape = genotype),
+                 size = 4) +
       scale_fill_brewer(type = "qual",
                         palette = "Dark2",
                         guide = FALSE) +
       scale_color_brewer(type = "qual",
                          palette = "Dark2",
-                         guide = FALSE)
+                         guide = FALSE) +
+      scale_shape_manual(values = c(21, 22, 24))
   })
   
 }
