@@ -6,6 +6,14 @@
 
 ## Adapted for Shiny by MST, 24 Jan 2019
 
+## TO DO
+## Sampling is slow for large population sizes. 
+## Would like to speed that up.
+##
+## Lower plot shows points ± chosen frequency, to represeent
+## sampled points AT that frequency. Perhaps simulate a few
+## points at that frequency?
+
 library(shiny)
 library(ggplot2)
 library(dplyr)
@@ -23,17 +31,23 @@ names(cols) <- genos
 ui <- fluidPage(
   
   # Application title
-  titlePanel("HWE Sampling"),
+  #titlePanel("HWE Sampling"),
   
   # Sidebar with a slider input for number of bins 
   sidebarLayout(
     sidebarPanel(
+      helpText("Theoretical and sampled frequencies for populations in 
+               Hardy-Weinberg equilibrium. Populations sampled randomly
+               will more closely match theoretical expectations as 
+               population size increases."),
       sliderInput("pop_size",
                   "Population Size",
                   min = 50,
                   max = 450,
                   value = 200,
                   step = 50),
+      helpText("Use the\ lower slider to choose a specific frequency for
+               p to see the theoretical and sampled genotype frequencies."),
       sliderInput("p_freq",
                   "Choose frequency of p:",
                   min = 0,
@@ -204,7 +218,8 @@ server <- function(input, output) {
       scale_color_brewer(type = "qual",
                          palette = "Dark2",
                          guide = FALSE) +
-      scale_shape_manual(values = c(21, 22, 24))
+      scale_shape_manual(values = c(21, 22, 24),
+                         guide = FALSE)
   })
   
 }
