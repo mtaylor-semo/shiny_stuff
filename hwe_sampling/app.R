@@ -11,9 +11,11 @@ library(ggplot2)
 library(dplyr)
 
 cols <-RColorBrewer::brewer.pal(3,"Dark2")
-names(cols) <- c("p2", "pq2", "q2")
+names(cols) <- c("p2", "2pq", "q2")
 
-genotypes <- c('A', 'a')
+alleles <- c('A', 'a')
+genos <- c("p2", "pq2", "q2")
+
 
 
 
@@ -85,7 +87,7 @@ server <- function(input, output) {
       N = input$pop_size
       a_freq <- c(p, q)
       
-      pop <- array(sample(genotypes, 2 * N, 
+      pop <- array(sample(alleles, 2 * N, 
                           p = a_freq, 
                           replace = T), 
                    dim = c(N, 2))
@@ -101,8 +103,8 @@ server <- function(input, output) {
         q <- 1 - p
         a_freq <- c(p, q)
         
-        pop[, 1] <- sample(genotypes, N, p = a_freq, replace = T)
-        pop[, 2] <- sample(genotypes, N, p = a_freq, replace = T)
+        pop[, 1] <- sample(alleles, N, p = a_freq, replace = T)
+        pop[, 2] <- sample(alleles, N, p = a_freq, replace = T)
         
         for (g in 1:num_generations)
           random_mating()
@@ -156,7 +158,7 @@ server <- function(input, output) {
        geom_point(aes(x = p, y = p2),
                   color = cols["p2"]) +
        geom_point(aes(x = p, y = pq2),
-                  color = cols["pq2"],
+                  color = cols["2pq"],
                   shape = 15) +
        geom_point(aes(x = p,
                       y = q2),
@@ -174,31 +176,23 @@ server <- function(input, output) {
     N <- input$pop_size
     
     
-    x <- rnorm(N, mean = freq, sd = 0.05)
-    hom1 <- function(x) x^2
-    hom2 <- function(x) (1 - x)^2
-    hets <- function(x) 2 * x * (1 - x)
-
-    genos <- c("p2", "2pq", "q2")
-    
-    df_sampled <- rnorm(N, freq, 0.07) %>% tibble(p2 = map_dbl(., hom1),
-                                     `2pq` = map_dbl(., hets),
-                                     q2 = map_dbl(., hom2)) %>% 
-      gather(key = genotype, value = freqs, contains("2")) %>% 
-      select(-`.`) %>% 
-      mutate(genotype = factor(genotype, levels = genos, ordered = TRUE))
-    
-    df <- data.frame(genotypes <- factor(genos, levels = genos, ordered = TRUE),
+    df <- data.frame(genotype <- factor(genos, levels = genos, ordered = TRUE),
                      freqs = c(freq^2, 2 * freq * (1-freq), (1 - freq)^2))
 
-    ggplot(df, aes(x = genotypes,
+    sampled <- sample_pop() %>% 
+      filter(p >= freq - 0.05 & p <= freq + 0.05) %>% 
+      select(contains("2")) %>% 
+      gather(key = genotype,
+             value = freqs)
+    
+    ggplot(df, aes(x = genotype,
                    y = freqs)) + ylim(0,1) +
-      geom_boxplot(data = df_sampled,
+      geom_point(data = sampled,
                   aes(x = genotype,
                       y = freqs,
-                      fill = genotype),
+                      color = genotype),
                   alpha = 0.5) +
-      geom_point(aes(fill = genotypes),
+      geom_point(aes(fill = genotype),
                  size = 3,
                  shape = 21) +
       scale_fill_brewer(type = "qual",
@@ -208,6 +202,7 @@ server <- function(input, output) {
                         palette = "Dark2",
                         guide = FALSE)
   })
+  
 }
 
 # Run the application 
