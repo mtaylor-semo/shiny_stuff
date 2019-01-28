@@ -118,7 +118,7 @@ server <- function(input, output) {
    })
    
    output$phylo_tree <- renderPlot({
-    plot(the_tree <- get_tree()[[2]], type = "phylo", direction = "upward")
+    plot(the_tree <- get_tree()[[2]], type = "phylo")
     nodelabels(text = the_tree$node.label,
                bg = "white")
     })
