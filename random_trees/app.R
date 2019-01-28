@@ -3,12 +3,16 @@
 ## Students draw phylogenetic trees from the matrix.
 ## Students can show the tree.
 
+## Options to show / hide trees from 
+## https://stackoverflow.com/q/54393592/3832941
+
 library(shiny)
 library(ape)
 library(phangorn)
+library(shinyjs)
 
 # Define UI for application that draws a histogram
-ui <- fluidPage(
+ui <- fluidPage(shinyjs::useShinyjs(),
   
   # Application title
   titlePanel("Draw Phylogenetic Trees"),
@@ -28,23 +32,25 @@ ui <- fluidPage(
                indicated by C1, C2, etc.
                The number of characters is always one less than the number
                of species."),
+      actionButton("new_matrix",
+                   "New dataset"),
       actionButton("show_tree",
-                   "Show answer"
-                   )
+                   "Show answer")
     ),
     # Show a plot of the generated distribution
     mainPanel(
       tableOutput("char_table"),
       
-      conditionalPanel("show_plot", 
-                       plotOutput("phylo_tree"))
+      plotOutput("phylo_tree")
     )
   )
 )
 
 # Define server logic required to draw a histogram
 server <- function(input, output) {
-   
+  
+#   showTree <- reactiveVal(FALSE)
+  
    tree_and_matrix <- function(){
 
     ntaxa <- input$num_taxa
@@ -74,9 +80,10 @@ server <- function(input, output) {
    }
    
    
-  get_tree <- reactive({
+  get_tree <- eventReactive(input$new_matrix, {
     list <- tree_and_matrix()
   })
+  
   
    output$char_table <- renderTable(
      rownames = TRUE,
@@ -87,11 +94,27 @@ server <- function(input, output) {
        
      })
    
-   p <- eventReactive(input$show_tree, {
-     plot(get_tree()[[2]], "phylo")
+   observeEvent(input$num_taxa, {
+#     showTree(FALSE) 
+     hide("phylo_tree")
    })
+   
+   observeEvent(input$new_matrix, {
+#     showTree(FALSE) 
+     hide("phylo_tree")
+   })
+   observeEvent(input$show_tree, {
+#     showTree(TRUE)
+     show("phylo_tree")
+   })
+   
+   #p <- eventReactive(input$show_tree, {
+  #   plot(get_tree()[[2]], "phylo")
+   #})
+   
    output$phylo_tree <- renderPlot({
-      p()
+      #if(showTree())
+        plot(get_tree()[[2]], "phylo")
     })
 }
 
