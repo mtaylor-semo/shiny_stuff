@@ -22,14 +22,14 @@ ui <- fluidPage(shinyjs::useShinyjs(),
     sidebarPanel(
       sliderInput("num_taxa",
                   "Number of species:",
-                  min = 6,
+                  min = 5,
                   max = 12,
-                  value = 8,
+                  value = 7,
                   step = 1),
-      helpText("Choose the number of species and then draw the tree from
-               the character matrix. Each row represents one species, 
-               indicated by letters. Each column repesents a character, 
-               indicated by C1, C2, etc.
+      helpText("Choose the number of species and then press the `New Dataset` button.
+                Draw the tree from resulting character matrix. Each row represents one taxon, 
+               indicated by T1, T2, etc. Each column repesents a character, 
+               indicated by C1, C2, etc. Click on `Show answer` to reveal the correct tree.
                The number of characters is always one less than the number
                of species."),
       actionButton("new_matrix",
@@ -56,27 +56,35 @@ server <- function(input, output) {
     ntaxa <- input$num_taxa
     nchar <- ntaxa - 1
 
-    char_mat <- array(0L, dim = c(ntaxa, ntaxa - 1))
+    tree <- rtree(ntaxa, br = NULL)
+    
+    # Gets descendants, but removes the first ntaxa elements,
+    # which are the individual tips
+    desc <- phangorn::Descendants(tree)[-seq(1, ntaxa)]
+    
+    char_mat <- array(0, dim = c(ntaxa, nchar))
     
     for (i in 1:nchar) {
-      char_mat[,i] <- replace(char_mat[,i], seq(1, (ntaxa+1)-i), 1)
+      char_mat[,i] <- replace(char_mat[,i], y <- desc[[i]], 1)
     }
     
-    char_mat <- char_mat[sample.int(nrow(char_mat)), # Shuffle rows
-                         sample.int(ncol(char_mat))] # and cols
+    char_names <- paste0("C",seq(1,nchar))
+    char_names <- sample(char_names, nchar, replace = FALSE)
     
-    col_names <- paste0("C",seq(1,nchar))
-    colnames(char_mat) <- col_names
-    rownames(char_mat) <- LETTERS[1:ntaxa]
+    node_labels <- char_names
+    
+    colnames(char_mat) <- char_names
+    rownames(char_mat) <- toupper(tree$tip.label)
+    tree$tip.label <- toupper(tree$tip.label)
+    
+    char_mat <- char_mat[order(rownames(char_mat)),
+                         order(colnames(char_mat))]
     
     mode(char_mat) <- "integer"
-
-    upgma_tree <- upgma(dist.gene(char_mat))
-    upgma_tree <- compute.brlen(upgma_tree, power = 1)
     
     # Make list item with data and tree
-    list("char_mat" = char_mat,
-         "phylo_tree" = upgma_tree)
+    list("char_mat" = data.frame(char_mat),
+         "phylo_tree" = tree)
    }
    
    
