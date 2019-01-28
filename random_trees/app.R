@@ -69,9 +69,10 @@ server <- function(input, output) {
     }
     
     char_names <- paste0("C",seq(1,nchar))
+
     char_names <- sample(char_names, nchar, replace = FALSE)
-    
-    node_labels <- char_names
+
+    tree$node.label <- char_names
     
     colnames(char_mat) <- char_names
     rownames(char_mat) <- toupper(tree$tip.label)
@@ -116,13 +117,10 @@ server <- function(input, output) {
      show("phylo_tree")
    })
    
-   #p <- eventReactive(input$show_tree, {
-  #   plot(get_tree()[[2]], "phylo")
-   #})
-   
    output$phylo_tree <- renderPlot({
-      #if(showTree())
-        plot(get_tree()[[2]], "phylo")
+    plot(the_tree <- get_tree()[[2]], type = "phylo", direction = "upward")
+    nodelabels(text = the_tree$node.label,
+               bg = "white")
     })
 }
 
