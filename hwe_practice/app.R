@@ -8,7 +8,7 @@ library(shiny)
 
 ui <- fluidPage(
   
-  titlePanel("Hardy-Weinberg practice: calculate observed frequencies"),
+  titlePanel("BI 163 Hardy-Weinberg practice: calculate observed frequencies"),
   
   sidebarLayout(
     sidebarPanel(
