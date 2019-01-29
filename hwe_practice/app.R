@@ -27,6 +27,7 @@ ui <- fluidPage(
                  this population is in Hardy-Weinberg equilibrium.
                  Use the observed number of each genotype to calculate
                  genotype frequencies and observed allele frequencies."),
+      helpText(strong("Round each step to 3 digits after the decimal point.")),
       hr(),
       textOutput("intro"),
       htmlOutput("question_hom1"),
