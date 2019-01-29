@@ -12,7 +12,7 @@ ui <- fluidPage(
   
   sidebarLayout(
     sidebarPanel(
-      withMathJax(),
+#      withMathJax(),
       helpText("Press \"New problem\" for a new problem to solve. Press
                  \"Show answer\" to see the solution. Refer to your notes 
                  for details of the steps."),
