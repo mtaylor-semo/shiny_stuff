@@ -1,3 +1,8 @@
+##
+## Calculate observed allele and genotypes for a diploid population.
+## Number of individuals are generated randomly.
+
+## MST 28 January 2019
 
 library(shiny)
 
