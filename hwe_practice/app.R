@@ -4,6 +4,9 @@
 
 ## MST 28 January 2019
 
+## To do: Add a calc to show what their final value should sum to
+## That is, 0.999, 1.000, or 1.001.
+
 library(shiny)
 
 ui <- fluidPage(
