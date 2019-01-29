@@ -3,13 +3,14 @@ library(shiny)
 
 ui <- fluidPage(
    
-   titlePanel("Practice HW: Counting "),
+   titlePanel("Hardy-Weinberg practice: calculate observed frequencies"),
    
    sidebarLayout(
       sidebarPanel(
         withMathJax(),
-        helpText("Press `New problem` for a new problem to solve. Press
-                 `Show answer` to see the solution."),
+        helpText("Press \"New problem\" for a new problem to solve. Press
+                 \"Show answer\" to see the solution. Refer to your notes 
+                 for details of the steps."),
         actionButton("new_problem",
                      "New problem"),
         actionButton("show_answer",
@@ -17,12 +18,13 @@ ui <- fluidPage(
       ),
       
       mainPanel(
-        textOutput("intro"),
-        htmlOutput("question_hom1"),
         helpText("Use the methods learned in class to calculate whether
                  this population is in Hardy-Weinberg equilibrium.
                  Use the observed number of each genotype to calculate
                  genotype frequencies and observed allele frequencies."),
+        hr(),
+        textOutput("intro"),
+        htmlOutput("question_hom1"),
         hr(),
          htmlOutput("answer"),
         uiOutput("check")
