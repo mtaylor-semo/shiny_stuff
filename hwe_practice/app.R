@@ -3,6 +3,7 @@
 ## Number of individuals are generated randomly.
 
 ## MST 28 January 2019
+## MST 30 January 2019: Merged simple and counting with navBar.
 
 library(shiny)
 
