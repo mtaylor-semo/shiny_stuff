@@ -6,6 +6,11 @@
 
 library(shiny)
 
+final_freq_warning <-
+  "The final frequencies of the genotypes might sum to 0.999, 1.000,
+or 1.001, due to rounding. If you do not obtain the values shown in the
+answer, then double-check your work."
+
 ui <- navbarPage(
   "BI 163 Hardy-Weinberg practice",
   
@@ -75,12 +80,9 @@ ui <- navbarPage(
                  Each gene has only two alleles."
                ),
                helpText(
-                 "The final frequencies of the genotypes might sum to 0.999, 1.000,
-                 or 1.001, due to rounding. If you do not obtain the values shown in the
-                 answer, then double-check your work."
+                 final_freq_warning
                ),
                hr(),
-#               textOutput("intro"),
                htmlOutput("question"),
                hr(),
                htmlOutput("answer")
@@ -97,12 +99,11 @@ ui <- navbarPage(
                   \"Show answer\" to see the solution. Refer to your notes
                   for details of the steps."
                 ),
-                actionButton("new_problem",
+                actionButton("new_counting_problem",
                              "New problem"),
                 actionButton("show_answer",
                              "Show answer")
                ),
-  #            
               mainPanel(
                 helpText(
                   "Use the methods learned in class to calculate whether
@@ -113,6 +114,7 @@ ui <- navbarPage(
                 helpText(strong(
                   "Round each step to 3 digits after the decimal point."
                 )),
+                helpText(final_freq_warning),
                 hr(),
                 textOutput("intro_counting"),
                 htmlOutput("question_counting"),
@@ -227,7 +229,7 @@ server <- function(input, output) {
 
 # Counting output ---------------------------------------------------------
 
-  observeEvent(input$new_problem, {
+  observeEvent(input$new_counting_problem, {
     show_ans(FALSE)
     LETTER <- sample(LETTERS, 1)
     counting$a1 <- paste0(LETTER, "<sub>1</sub>")
@@ -278,7 +280,8 @@ server <- function(input, output) {
               The frequency of the %s allele is %d/%d = %0.3f.</br></br>
               The frequency of the %s genotype is %d/%d = %0.3f</br> 
               The frequency of the %s genotype is %d/%d = %0.3f</br> 
-              The frequency of the %s genotype is %d/%d = %0.3f</br>", 
+              The frequency of the %s genotype is %d/%d = %0.3f</br></br>
+              The three genotype frequencies sum to %1.3f", 
               # First sentence
               counting$N, 
               counting$N*2, 
@@ -316,7 +319,8 @@ server <- function(input, output) {
               counting$genotypes[3],
               counting$genotype_nums[3],
               counting$N,
-              counting$geno_freqs[3])
+              counting$geno_freqs[3],
+              sum(counting$geno_freqs))
     }
   })
   output$check <- renderUI({
