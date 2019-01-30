@@ -17,6 +17,23 @@ or 1.001, due to rounding. If you do not obtain the values shown in the
 answer, then double-check your work."
 
 
+# Global functions --------------------------------------------------------
+
+# Sample a random letter to use for allele and genotype names.
+get_names <- function(react_list) {
+  LETTER <- sample(LETTERS, 1)
+  react_list$a1 <- paste0(LETTER, "<sub>1</sub>")
+  react_list$a2 <- paste0(LETTER, "<sub>2</sub>")
+  
+  hom1 <- paste0(react_list$a1, react_list$a1)
+  het <- paste0(react_list$a1, react_list$a2)
+  hom2 <- paste0(react_list$a2, react_list$a2)
+  
+  react_list$genotypes <- c(hom1, het, hom2)
+  react_list
+}
+
+
 # UI ----------------------------------------------------------------------
 
 
@@ -147,7 +164,8 @@ ui <- navbarPage(
 # Server ------------------------------------------------------------------
 
 
-server <- function(input, output) {
+server <- function(input, output, session) {
+  session$onSessionEnded(stopApp)
   # Overview output ---------------------------------------------------------
   
   output$equations <- renderUI({
@@ -171,21 +189,13 @@ server <- function(input, output) {
   simple <- reactiveValues()#
   counting <- reactiveValues()
   
-  
   # Simple output -----------------------------------------------------------
   
   observeEvent(input$new_simple_problem, {
     show_simple_ans(FALSE)
     
-    LETTER <- sample(LETTERS, 1)
-    simple$a1 <- paste0(LETTER, "<sub>1</sub>")
-    simple$a2 <- paste0(LETTER, "<sub>2</sub>")
-    
-    hom1 <- paste0(simple$a1, simple$a1)
-    het <- paste0(simple$a1, simple$a2)
-    hom2 <- paste0(simple$a2, simple$a2)
-    
-    simple$genotypes <- c(hom1, het, hom2)
+    # Get allele and genotype names
+    simple <- get_names(simple)
     
     simple$allele1 <- round(runif(1, 0.1, 0.9), 3)
     simple$allele2 <- 1 - simple$allele1
@@ -264,15 +274,9 @@ server <- function(input, output) {
   
   observeEvent(input$new_counting_problem, {
     show_ans(FALSE)
-    LETTER <- sample(LETTERS, 1)
-    counting$a1 <- paste0(LETTER, "<sub>1</sub>")
-    counting$a2 <- paste0(LETTER, "<sub>2</sub>")
     
-    hom1 <- paste0(counting$a1, counting$a1)
-    het <- paste0(counting$a1, counting$a2)
-    hom2 <- paste0(counting$a2, counting$a2)
-    
-    counting$genotypes <- c(hom1, het, hom2)
+    # Get allele and genotype names
+    counting <- get_names(counting)
     
     counting$genotype_nums <- floor(runif(3, 4, 101))
     counting$N <- sum(counting$genotype_nums)
