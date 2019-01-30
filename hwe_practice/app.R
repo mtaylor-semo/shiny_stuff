@@ -129,8 +129,19 @@ ui <- navbarPage(
                htmlOutput("answer_counting"),
                uiOutput("check")
                )
-))
+)),
+  # Chi-square problems  ---------------------------------------------------
+  tabPanel(
+    withMathJax("\\(\\chi^2\\)"),
+    mainPanel(
+      "Are apparent deviations from Hardy-Weinberg equilibrium
+      biologically meaningful or an artifact of sampling? A",
+      withMathJax("\\(\\chi^2\\)"),
+      "test will help you.",
+      strong("Coming soon.")
+    )
   )
+)
 
 
 # Server ------------------------------------------------------------------
@@ -373,6 +384,10 @@ server <- function(input, output) {
       
     }
   })
+  
+
+# Chi-square output -------------------------------------------------------
+
   
   }
 
