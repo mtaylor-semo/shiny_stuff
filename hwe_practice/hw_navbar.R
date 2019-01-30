@@ -80,7 +80,7 @@ ui <- navbarPage(
                  answer, then double-check your work."
                ),
                hr(),
-               textOutput("intro"),
+#               textOutput("intro"),
                htmlOutput("question"),
                hr(),
                htmlOutput("answer")
@@ -96,11 +96,11 @@ ui <- navbarPage(
                   "Press \"New problem\" for a new problem to solve. Press
                   \"Show answer\" to see the solution. Refer to your notes
                   for details of the steps."
-                )#,
-  #              actionButton("new_problem",
-  #                           "New problem"),
-  #              actionButton("show_answer",
-  #                           "Show answer")
+                ),
+                actionButton("new_problem",
+                             "New problem"),
+                actionButton("show_answer",
+                             "Show answer")
                ),
   #            
               mainPanel(
@@ -109,21 +109,24 @@ ui <- navbarPage(
                   this population is in Hardy-Weinberg equilibrium.
                   Use the observed number of each genotype to calculate
                   genotype frequencies and observed allele frequencies."
-                )#,
-  #              helpText(strong(
-  #                "Round each step to 3 digits after the decimal point."
-  #              )),
-  #              hr(),
-  #              textOutput("intro"),
-  #              htmlOutput("question_hom1"),
-  #              hr(),
-  #              htmlOutput("answer"),
-  #              uiOutput("check")
+                ),
+                helpText(strong(
+                  "Round each step to 3 digits after the decimal point."
+                )),
+                hr(),
+                textOutput("intro_counting"),
+                htmlOutput("question_counting"),
+                hr(),
+                htmlOutput("answer_counting"),
+                uiOutput("check")
                 )
               ))
   )
 
 server <- function(input, output) {
+  
+
+# Overview output ---------------------------------------------------------
   
   output$equations <- renderUI({
     withMathJax(
@@ -136,14 +139,20 @@ server <- function(input, output) {
       )
       )
   })
-  
+ 
+
+# Reactive values ---------------------------------------------------------
+
   show_simple_ans <- reactiveVal(FALSE)
   show_ans <- reactiveVal(FALSE)
   
   simple <- reactiveValues()#
-  values <- reactiveValues()
+  counting <- reactiveValues()
   
-  observeEvent(input$new_simple_problem, {
+
+# Simple output -----------------------------------------------------------
+
+    observeEvent(input$new_simple_problem, {
     show_simple_ans(FALSE)
     
     LETTER <- sample(LETTERS, 1)
@@ -215,6 +224,117 @@ server <- function(input, output) {
       )
     }
   })
+
+# Counting output ---------------------------------------------------------
+
+  observeEvent(input$new_problem, {
+    show_ans(FALSE)
+    LETTER <- sample(LETTERS, 1)
+    counting$a1 <- paste0(LETTER, "<sub>1</sub>")
+    counting$a2 <- paste0(LETTER, "<sub>2</sub>")
+    
+    hom1 <- paste0(counting$a1, counting$a1)
+    het <- paste0(counting$a1, counting$a2)
+    hom2 <- paste0(counting$a2, counting$a2)
+    
+    counting$genotypes <- c(hom1, het, hom2)
+    
+    counting$genotype_nums <- floor(runif(3, 4, 101))
+    counting$N <- sum(counting$genotype_nums)
+    
+    counting$geno_freqs <- round(counting$genotype_nums/counting$N, 3)
+    
+    counting$allele1 <- counting$genotype_nums[1]*2 + counting$genotype_nums[2]
+    counting$allele2 <- counting$genotype_nums[3]*2 + counting$genotype_nums[2]
+    counting$allele1_freq <- round(counting$allele1/(counting$N*2), 3)
+    counting$allele2_freq <- round(counting$allele2/(counting$N*2), 3)
+    
+  }, ignoreNULL = FALSE)
+  
+  output$intro_counting <- renderText({
+    sprintf("A sample of %d individuals contained:",
+            counting$N)
+  })
+  output$question_counting <- renderText({
+    
+    paste(counting$genotype_nums[1], 
+          counting$genotypes[1], "individuals,</br>",
+          counting$genotype_nums[2], 
+          counting$genotypes[2], "individuals, and </br>",
+          counting$genotype_nums[3],
+          counting$genotypes[3], "individuals")
+  })
+  
+  observeEvent(input$show_answer, {
+    show_ans(TRUE)
+  })
+  
+  output$answer_counting <- renderText({
+    if (show_ans()) {
+      sprintf("The sample has %d \u00D7 2 = %d total alleles.</br></br>
+              The sample has %d \u00D7 2 + %d = %d total %s alleles.</br>
+              The sample has %d \u00D7 2 + %d = %d  total %s alleles.</br></br>
+              The frequency of the %s allele is %d/%d = %0.3f.</br>
+              The frequency of the %s allele is %d/%d = %0.3f.</br></br>
+              The frequency of the %s genotype is %d/%d = %0.3f</br> 
+              The frequency of the %s genotype is %d/%d = %0.3f</br> 
+              The frequency of the %s genotype is %d/%d = %0.3f</br>", 
+              # First sentence
+              counting$N, 
+              counting$N*2, 
+              # second sentence
+              counting$genotype_nums[1],
+              counting$genotype_nums[2], 
+              counting$allele1,
+              counting$a1, 
+              # third sentence
+              counting$genotype_nums[3],
+              counting$genotype_nums[2], 
+              counting$allele2,
+              counting$a2,
+              # fourth sentence
+              counting$a1,
+              counting$allele1,
+              counting$N*2,
+              counting$allele1_freq,
+              # fifth sentence
+              counting$a2,
+              counting$allele2,
+              counting$N*2,
+              counting$allele2_freq,
+              # sixth sentence
+              counting$genotypes[1],
+              counting$genotype_nums[1],
+              counting$N,
+              counting$geno_freqs[1],
+              # sixth sentence
+              counting$genotypes[2],
+              counting$genotype_nums[2],
+              counting$N,
+              counting$geno_freqs[2],
+              # sixth sentence
+              counting$genotypes[3],
+              counting$genotype_nums[3],
+              counting$N,
+              counting$geno_freqs[3])
+    }
+  })
+  output$check <- renderUI({
+    if (show_ans()) {
+      withMathJax(
+        HTML(sprintf("<hr><b>Check:</b></br>\\(\\sqrt{%0.3f}  = %0.3f ≠ %0.3f \\)</br>
+                     \\(\\sqrt{%0.3f}  = %0.3f ≠ %0.3f\\)</br>",
+                     counting$geno_freqs[1], 
+                     sqrt(counting$geno_freqs[1]), 
+                     counting$allele1_freq,
+                     counting$geno_freqs[3], 
+                     sqrt(counting$geno_freqs[3]), 
+                     counting$allele2_freq))
+      )
+      
+    }
+  })
+  
 }
 
 # Run the application 
