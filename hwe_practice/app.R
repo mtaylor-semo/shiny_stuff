@@ -34,7 +34,8 @@ get_names <- function(react_list) {
 }
 
 sample_genotypes <- function(react_list) {
-  react_list$genotype_nums <- floor(runif(3, 4, 101))
+  react_list$genotype_nums <- floor(runif(n = 3, min = 5, max = 76))
+  
   react_list$N <- sum(react_list$genotype_nums)
   
   react_list$geno_freqs <-
@@ -42,14 +43,19 @@ sample_genotypes <- function(react_list) {
   
   react_list$allele1 <-
     react_list$genotype_nums[1] * 2 + react_list$genotype_nums[2]
+  
   react_list$allele2 <-
     react_list$genotype_nums[3] * 2 + react_list$genotype_nums[2]
+  
   react_list$allele1_freq <-
     round(react_list$allele1 / (react_list$N * 2), 3)
+  
   react_list$allele2_freq <-
     round(react_list$allele2 / (react_list$N * 2), 3)
+  
   react_list
 }
+
 # UI ----------------------------------------------------------------------
 
 
@@ -164,39 +170,40 @@ ui <- navbarPage(
                )
 )),
   # Chi-square problems  ---------------------------------------------------
-tabPanel(withMathJax("\\(\\chi^2\\)"),
-         sidebarLayout(
-           sidebarPanel(
-             helpText(
-               "Press \"New problem\" for a new problem to solve. Press
-               \"Show answer\" to see the solution. Refer to your notes
-               for details of the steps."
-             ),
-             actionButton("new_chi_problem",
-                          "New problem"),
-             actionButton("show_chi_answer",
-                          "Show answer")
-             ),
-           mainPanel(
-            helpText(
-              "Are apparent deviations from Hardy-Weinberg equilibrium
-                         biologically meaningful or an artifact of sampling? Use the",
-              withMathJax("\\(\\chi^2\\)"), "test learned in lab to calculate whether
-              this population is in Hardy-Weinberg equilibrium.
-              Use the observed number of each genotype to calculate
-              genotype frequencies and observed allele frequencies."
-            ),
-            helpText(strong(
-              "Round each step to 3 digits after the decimal point."
-            )),
-            helpText(final_freq_warning),
-            hr(),
-            textOutput("intro_chi"),
-            htmlOutput("question_chi"),
-            hr(),
-            htmlOutput("answer_chi")#,
-#uiOutput("check")
-                        )
+  tabPanel(withMathJax("\\(\\chi^2\\)"),
+           sidebarLayout(
+             sidebarPanel(
+               helpText(
+                 "Press \"New problem\" for a new problem to solve. Press
+                 \"Show answer\" to see the solution. Refer to your notes
+                 for details of the steps."
+               ),
+               actionButton("new_chi_problem",
+                            "New problem"),
+               actionButton("show_chi_answer",
+                            "Show answer")
+               ),
+             mainPanel(
+              helpText(
+                "Are apparent deviations from Hardy-Weinberg equilibrium
+                           biologically meaningful or an artifact of sampling? Use the",
+                withMathJax("\\(\\chi^2\\)"), "test learned in lab to calculate whether
+                this population is in Hardy-Weinberg equilibrium.
+                Use the observed number of each genotype to calculate
+                genotype frequencies and observed allele frequencies."
+              ),
+              helpText(strong(
+                "Round each step to 3 digits after the decimal point."
+              )),
+              helpText(final_freq_warning),
+              hr(),
+              textOutput("intro_chi"),
+              htmlOutput("question_chi"),
+              hr(),
+              htmlOutput("answer_chi"),
+              hr(),
+              tableOutput("chi_table")
+            )
 )) # End chi tabPanel
 ) # end UI
 
@@ -350,7 +357,7 @@ server <- function(input, output, session) {
       "individuals, and </br>",
       counting$genotype_nums[3],
       counting$genotypes[3],
-      "individuals"
+      "individuals."
     )
   })
   
@@ -431,7 +438,7 @@ server <- function(input, output, session) {
   })
   
 
-# Chi-square output -------------------------------------------------------
+  # Chi-square output -----------------------------------------------------
 
   observeEvent(input$new_chi_problem, {
     show_chi_ans(FALSE)
@@ -456,7 +463,7 @@ server <- function(input, output, session) {
       "individuals, and </br>",
       chi$genotype_nums[3],
       chi$genotypes[3],
-      "individuals"
+      "individuals."
     )
   })
   
@@ -467,13 +474,17 @@ server <- function(input, output, session) {
   output$answer_chi <- renderText({
     if (show_chi_ans()) {
       
-      predicted_geno_nums <- array(dim = 3)
-      predicted_geno_nums[1] <- chi$allele1_freq^2 * chi$N
-      predicted_geno_nums[2] <- 2 * chi$allele1_freq * chi$allele2_freq * chi$N
-      predicted_geno_nums[3] <- chi$allele2_freq ^ 2 * chi$N
+     prob_vec <- array(dim = 3)
+     prob_vec[1] <- chi$allele1_freq^2
+     prob_vec[2] <- 2 * chi$allele1_freq * chi$allele2_freq
+     prob_vec[3] <- chi$allele2_freq ^ 2
       
-      chi_result <- chisq.test(predicted_geno_nums)
-      print(chi_result$observed)
+      chi_result <- chisq.test(x = chi$genotype_nums, p = prob_vec)
+      chi_prob <- 1-pchisq(chi_result$statistic, df = 1)
+      chi$result <- chi_result
+      
+      sprintf("Fred")
+      #print(chi$result$statistic)
       
       # sprintf(
       #   "The sample has %d \u00D7 2 = %d total alleles.</br></br>
@@ -528,6 +539,17 @@ server <- function(input, output, session) {
     }
   })
   
+  output$chi_table <- renderTable({
+    if(show_chi_ans()){
+    x <- round(chi$result$observed, 0)
+    y <- chi$result$expected
+    z <- x - y
+    z2 <- z^2
+    z2e <- z2/y
+    df <- tibble::tibble(Obs = x, Exp = y, `Obs-Exp` = z, `Obs-Exp^2` = z2, `Obs-Exp^2/Exp` = z2e)
+    df
+    }
+  })
   } # End server
 
 # Run the application
