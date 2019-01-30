@@ -33,7 +33,23 @@ get_names <- function(react_list) {
   react_list
 }
 
-
+sample_genotypes <- function(react_list) {
+  react_list$genotype_nums <- floor(runif(3, 4, 101))
+  react_list$N <- sum(react_list$genotype_nums)
+  
+  react_list$geno_freqs <-
+    round(react_list$genotype_nums / react_list$N, 3)
+  
+  react_list$allele1 <-
+    react_list$genotype_nums[1] * 2 + react_list$genotype_nums[2]
+  react_list$allele2 <-
+    react_list$genotype_nums[3] * 2 + react_list$genotype_nums[2]
+  react_list$allele1_freq <-
+    round(react_list$allele1 / (react_list$N * 2), 3)
+  react_list$allele2_freq <-
+    round(react_list$allele2 / (react_list$N * 2), 3)
+  react_list
+}
 # UI ----------------------------------------------------------------------
 
 
@@ -148,18 +164,28 @@ ui <- navbarPage(
                )
 )),
   # Chi-square problems  ---------------------------------------------------
-  tabPanel(
-    withMathJax("\\(\\chi^2\\)"),
-    mainPanel(
-      "Are apparent deviations from Hardy-Weinberg equilibrium
-      biologically meaningful or an artifact of sampling? A",
-      withMathJax("\\(\\chi^2\\)"),
-      "test will help you.",
-      strong("Coming soon.")
-    )
-  )
-)
-
+tabPanel(withMathJax("\\(\\chi^2\\)"),
+         sidebarLayout(
+           sidebarPanel(
+             helpText(
+               "Press \"New problem\" for a new problem to solve. Press
+               \"Show answer\" to see the solution. Refer to your notes
+               for details of the steps."
+             ),
+             actionButton("new_chi_problem",
+                          "New problem"),
+             actionButton("show_chi_answer",
+                          "Show answer")
+             ),
+           mainPanel(
+             "Are apparent deviations from Hardy-Weinberg equilibrium
+             biologically meaningful or an artifact of sampling? A",
+             withMathJax("\\(\\chi^2\\)"),
+             "test will help you.",
+             strong("Coming soon.")
+           )
+)) # End chi tabPanel
+) # end UI
 
 # Server ------------------------------------------------------------------
 
@@ -188,6 +214,7 @@ server <- function(input, output, session) {
   
   simple <- reactiveValues()#
   counting <- reactiveValues()
+  chi <- reactiveValues()
   
   # Simple output -----------------------------------------------------------
   
@@ -277,21 +304,21 @@ server <- function(input, output, session) {
     
     # Get allele and genotype names
     counting <- get_names(counting)
-    
-    counting$genotype_nums <- floor(runif(3, 4, 101))
-    counting$N <- sum(counting$genotype_nums)
-    
-    counting$geno_freqs <-
-      round(counting$genotype_nums / counting$N, 3)
-    
-    counting$allele1 <-
-      counting$genotype_nums[1] * 2 + counting$genotype_nums[2]
-    counting$allele2 <-
-      counting$genotype_nums[3] * 2 + counting$genotype_nums[2]
-    counting$allele1_freq <-
-      round(counting$allele1 / (counting$N * 2), 3)
-    counting$allele2_freq <-
-      round(counting$allele2 / (counting$N * 2), 3)
+    counting <- sample_genotypes(counting)
+    # counting$genotype_nums <- floor(runif(3, 4, 101))
+    # counting$N <- sum(counting$genotype_nums)
+    # 
+    # counting$geno_freqs <-
+    #   round(counting$genotype_nums / counting$N, 3)
+    # 
+    # counting$allele1 <-
+    #   counting$genotype_nums[1] * 2 + counting$genotype_nums[2]
+    # counting$allele2 <-
+    #   counting$genotype_nums[3] * 2 + counting$genotype_nums[2]
+    # counting$allele1_freq <-
+    #   round(counting$allele1 / (counting$N * 2), 3)
+    # counting$allele2_freq <-
+    #   round(counting$allele2 / (counting$N * 2), 3)
     
   }, ignoreNULL = FALSE)
   
