@@ -178,12 +178,25 @@ tabPanel(withMathJax("\\(\\chi^2\\)"),
                           "Show answer")
              ),
            mainPanel(
-             "Are apparent deviations from Hardy-Weinberg equilibrium
-             biologically meaningful or an artifact of sampling? A",
-             withMathJax("\\(\\chi^2\\)"),
-             "test will help you.",
-             strong("Coming soon.")
-           )
+            helpText(
+              "Are apparent deviations from Hardy-Weinberg equilibrium
+                         biologically meaningful or an artifact of sampling? Use the",
+              withMathJax("\\(\\chi^2\\)"), "test learned in lab to calculate whether
+              this population is in Hardy-Weinberg equilibrium.
+              Use the observed number of each genotype to calculate
+              genotype frequencies and observed allele frequencies."
+            ),
+            helpText(strong(
+              "Round each step to 3 digits after the decimal point."
+            )),
+            helpText(final_freq_warning),
+            hr(),
+            textOutput("intro_chi"),
+            htmlOutput("question_chi"),
+            hr(),
+            htmlOutput("answer_chi")#,
+#uiOutput("check")
+                        )
 )) # End chi tabPanel
 ) # end UI
 
@@ -211,6 +224,7 @@ server <- function(input, output, session) {
   
   show_simple_ans <- reactiveVal(FALSE)
   show_ans <- reactiveVal(FALSE)
+  show_chi_ans <- reactiveVal(FALSE)
   
   simple <- reactiveValues()#
   counting <- reactiveValues()
@@ -419,8 +433,102 @@ server <- function(input, output, session) {
 
 # Chi-square output -------------------------------------------------------
 
+  observeEvent(input$new_chi_problem, {
+    show_chi_ans(FALSE)
+    
+    # Get allele and genotype names
+    chi <- get_names(chi)
+    chi <- sample_genotypes(chi)
+
+  }, ignoreNULL = FALSE)
   
-  }
+  output$intro_chi <- renderText({
+    sprintf("A sample of %d individuals contained:",
+            chi$N)
+  })
+  output$question_chi <- renderText({
+    paste(
+      chi$genotype_nums[1],
+      chi$genotypes[1],
+      "individuals,</br>",
+      chi$genotype_nums[2],
+      chi$genotypes[2],
+      "individuals, and </br>",
+      chi$genotype_nums[3],
+      chi$genotypes[3],
+      "individuals"
+    )
+  })
+  
+  observeEvent(input$show_chi_answer, {
+    show_chi_ans(TRUE)
+  })
+  
+  output$answer_chi <- renderText({
+    if (show_chi_ans()) {
+      
+      predicted_geno_nums <- array(dim = 3)
+      predicted_geno_nums[1] <- chi$allele1_freq^2 * chi$N
+      predicted_geno_nums[2] <- 2 * chi$allele1_freq * chi$allele2_freq * chi$N
+      predicted_geno_nums[3] <- chi$allele2_freq ^ 2 * chi$N
+      
+      chi_result <- chisq.test(predicted_geno_nums)
+      print(chi_result$observed)
+      
+      # sprintf(
+      #   "The sample has %d \u00D7 2 = %d total alleles.</br></br>
+      #   The sample has %d \u00D7 2 + %d = %d total %s alleles.</br>
+      #   The sample has %d \u00D7 2 + %d = %d  total %s alleles.</br></br>
+      #   The frequency of the %s allele is %d/%d = %0.3f.</br>
+      #   The frequency of the %s allele is %d/%d = %0.3f.</br></br>
+      #   The frequency of the %s genotype is %d/%d = %0.3f</br>
+      #   The frequency of the %s genotype is %d/%d = %0.3f</br>
+      #   The frequency of the %s genotype is %d/%d = %0.3f</br></br>
+      #   The three genotype frequencies sum to %1.3f",
+      #   # First sentence
+      #   chi$N,
+      #   chi$N * 2,
+      #   # second sentence
+      #   chi$genotype_nums[1],
+      #   chi$genotype_nums[2],
+      #   chi$allele1,
+      #   chi$a1,
+      #   # third sentence
+      #   chi$genotype_nums[3],
+      #   chi$genotype_nums[2],
+      #   chi$allele2,
+      #   chi$a2,
+      #   # fourth sentence
+      #   chi$a1,
+      #   chi$allele1,
+      #   chi$N * 2,
+      #   chi$allele1_freq,
+      #   # fifth sentence
+      #   chi$a2,
+      #   chi$allele2,
+      #   chi$N * 2,
+      #   chi$allele2_freq,
+      #   # sixth sentence
+      #   chi$genotypes[1],
+      #   chi$genotype_nums[1],
+      #   chi$N,
+      #   chi$geno_freqs[1],
+      #   # sixth sentence
+      #   chi$genotypes[2],
+      #   chi$genotype_nums[2],
+      #   chi$N,
+      #   chi$geno_freqs[2],
+      #   # sixth sentence
+      #   chi$genotypes[3],
+      #   chi$genotype_nums[3],
+      #   chi$N,
+      #   chi$geno_freqs[3],
+      #   sum(chi$geno_freqs)
+      # )
+    }
+  })
+  
+  } # End server
 
 # Run the application
 shinyApp(ui = ui, server = server)
