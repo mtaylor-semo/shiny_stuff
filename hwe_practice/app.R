@@ -7,10 +7,18 @@
 
 library(shiny)
 
+
+# Global variables --------------------------------------------------------
+
+
 final_freq_warning <-
   "The final frequencies of the genotypes might sum to 0.999, 1.000,
 or 1.001, due to rounding. If you do not obtain the values shown in the
 answer, then double-check your work."
+
+
+# UI ----------------------------------------------------------------------
+
 
 ui <- navbarPage(
   "BI 163 Hardy-Weinberg practice",
@@ -123,6 +131,10 @@ ui <- navbarPage(
                )
 ))
   )
+
+
+# Server ------------------------------------------------------------------
+
 
 server <- function(input, output) {
   # Overview output ---------------------------------------------------------
