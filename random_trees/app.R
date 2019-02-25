@@ -22,21 +22,21 @@ ui <- navbarPage(
     mainPanel(
       helpText(
         "This site presents two types of phylogenetic tree problems so you
-        can practice and develop your tree-building skills, for anywhere from
-        5 to 12 taxa."
-      ),
-      helpText(
-        strong("Remember:"), "A taxon (plural: taxa) can represent a species, a family, or 
+        can practice your tree-building skills, for 5 to 12 taxa.", strong("Remember:"), "A taxon (plural: taxa) can represent a species, a family, or 
         any other taxonomic level. "
       ),
       helpText(
-        "The \"Data First\" tab presents to you a presence-absence (0/1) character matrix
+        "The \"Data First\" tab starts with a presence-absence (0/1) character matrix
         that you use as data to build a tree."
       ),
       helpText(
-        "The \"Tree First\" tab presents to you a phylogenetic tree that you use to 
+        "The \"Tree First\" tab starts with a phylogenetic tree that you use to 
         make the presence-absence (0/1) character matrix. This will help you think 
-        about the phylogenetic trees in a different way."
+        about phylogenetic trees in a different way."
+      ),
+      helpText(
+        strong("The phylogenetic trees will not show the root but you should draw the
+               root on your trees.")
       )
       )),
 
@@ -55,7 +55,7 @@ ui <- navbarPage(
                indicated by T1, T2, etc. Each column repesents a character,
                indicated by C1, C2, etc. Click on `Show answer` to reveal the correct tree.
                The number of characters is always one less than the number
-               of species."),
+               of taxa."),
       actionButton("new_matrix",
                    "New dataset"),
       actionButton("show_tree",
@@ -81,8 +81,8 @@ tabPanel("Tree First",
                     Build the character matrix from the resulting tree. Make each row 
                     represent one taxon, using T1, T2, etc. Make each column repesents 
                     one character, using C1, C2, etc. Click on `Show answer` to reveal the 
-                    correct matrix. The number of taxa is always one more than the number
-                    of characters."),
+                    correct matrix. The number of characters is always one less than the 
+                    number of taxa."),
            actionButton("new_tree",
                         "New tree"),
            actionButton("show_matrix",
