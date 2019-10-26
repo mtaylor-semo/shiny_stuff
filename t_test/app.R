@@ -40,41 +40,50 @@ t_range <- tibble(t = c(min_scale, max_scale))
 # Shiny UI ----------------------------------------------------------------
 
 ui <- fluidPage(
-   
-   # Application title
-   titlePanel("T-test"),
-   
-   # Sidebar
-   sidebarLayout(
-      sidebarPanel(
-         sliderInput("tall_mean",
-                     "Mean of variable population:",
-                     min = 62,
-                     max = 74,
-                     value = 68,
-                     step = 1),
-         sliderInput("sample_size",
-                     "Sample size (each population)",
-                     min = 10,
-                     max = 40,
-                     value = 25,
-                     step = 1),
-         helpText("One sample has a mean of about 68. Change the slider
-                  to set the mean for the second (variable) sample. Change the slider
-                  to change the same size for each sample"),
-         hr(),
-         helpText("TO DO: Add a Resample button."),
-         helpText("TO DO: Put sliders and first graph in one row. Second row has t-graph
-                  and info on how to interpret the arrow and the range encompassing zero.")
-      ),
-      
-      # Show a plot of the generated distribution
-      mainPanel(
-         plotOutput("densityPlot"),
-         plotOutput("tPlot")
-      )
-   )
+  
+  # Application title
+  titlePanel("T-test"),
+  
+  # First Row
+  fluidRow(
+    column(3, wellPanel(
+    sliderInput(
+      "tall_mean",
+      "Mean of variable population:",
+      min = 62,
+      max = 74,
+      value = 68,
+      step = 1
+    ),
+    sliderInput(
+      "sample_size",
+      "Sample size (each population)",
+      min = 10,
+      max = 40,
+      value = 25,
+      step = 1
+    ),
+    p("One sample has a mean of about 68. Change the slider
+       to set the mean for the second (variable) sample. Change the slider
+       to change the same size for each sample"
+    ),
+    p("TO DO: Add a Resample button.")
+  )),
+  column(7, offset = 1,
+         plotOutput("densityPlot")
+  )),
+  hr(),
+  # Second row
+  fluidRow(
+    column(3, wellPanel(
+           p("TO DO: Add info on how to interpret the arrow and the range encompassing zero.")
+    )),
+    column(7, offset = 1,
+           plotOutput("tPlot")
+    )
+  )
 )
+  
 
 
 # Shiny server ------------------------------------------------------------
@@ -89,8 +98,8 @@ server <- function(input, output) {
   })
 
   data_set <- reactive({
-    df <- tibble(fixed = short_set(),
-                 variable = rnorm(input$sample_size, 
+    df <- tibble(Fixed = short_set(),
+                 Variable = rnorm(input$sample_size, 
                               mean = input$tall_mean, 
                               sd = stdev))
     df <- gather(df, key = "group", 
@@ -125,6 +134,7 @@ server <- function(input, output) {
       scale_fill_brewer(palette = "Dark2") +
       labs(x = "Mean", 
            y = "Probability",
+           fill = "Sample",
            title = paste("t =", t_value, "with", degrees_freedom, "degrees of freedom"))
 #      ggtitle(paste("t =", t_value, "with", degrees_freedom, "degrees of freedom"))
   })
@@ -191,7 +201,7 @@ server <- function(input, output) {
                   label = paste("t =", round(t_test()$statistic, 2)),
                   vjust = 0,
                   position = position_nudge(y = 0.01)) +
-        labs(x = "Student's t",
+        labs(x = expression("Student's"~italic(t)),
              y = "Probability")
   })  
   
