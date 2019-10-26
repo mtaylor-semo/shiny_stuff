@@ -39,11 +39,10 @@ t_range <- tibble(t = c(min_scale, max_scale))
 
 # Shiny UI ----------------------------------------------------------------
 
-ui <- fluidPage(
+ui <- fluidPage(theme = "bootstrap2015.css",
   
   # Application title
-  titlePanel("T-test"),
-  
+  titlePanel(title=div(img(src="semo_logo.png", height="50px"), "T-test")),
   # First Row
   fluidRow(
     column(3, wellPanel(
