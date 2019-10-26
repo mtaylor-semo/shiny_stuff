@@ -17,15 +17,17 @@
 library(shiny)
 library(tidyverse)
 library(broom)
-
+library(RColorBrewer)
 
 # Global vars -------------------------------------------------------------
 
 
-mean_colors <- RColorBrewer::brewer.pal(3, "Dark2")
+mean_colors <- brewer.pal(3, "Dark2")
 
 stdev <- 3
 short_mean <- 68
+tall_stdev <- 5
+
 
 y_point <- 0.45
 alpha <- 0.05
@@ -56,7 +58,14 @@ ui <- fluidPage(
                      min = 10,
                      max = 40,
                      value = 25,
-                     step = 1)
+                     step = 1),
+         helpText("One sample has a mean of about 68. Change the slider
+                  to set the mean for the second (variable) sample. Change the slider
+                  to change the same size for each sample"),
+         hr(),
+         helpText("TO DO: Add a Resample button."),
+         helpText("TO DO: Put sliders and first graph in one row. Second row has t-graph
+                  and info on how to interpret the arrow and the range encompassing zero.")
       ),
       
       # Show a plot of the generated distribution
