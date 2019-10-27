@@ -39,11 +39,12 @@ t_range <- tibble(t = c(min_scale, max_scale))
 
 # Shiny UI ----------------------------------------------------------------
 
-ui <- fluidPage(theme = "bootstrap2015.css",
-  
-  # Application title
-  titlePanel(title=div(img(src="semo_logo.png", height="50px"), "T-test")),
+ui <-
+  fluidPage(theme = "semo_test.css",
+            # Application title
+            titlePanel(title=div(img(src="semo_logo.png", height="70px"), "T-test")),
   # First Row
+  
   fluidRow(
     column(3, wellPanel(
     sliderInput(
@@ -71,7 +72,7 @@ ui <- fluidPage(theme = "bootstrap2015.css",
   column(7, offset = 1,
          plotOutput("densityPlot")
   )),
-  hr(),
+  tags$hr(class = "custom"),
   # Second row
   fluidRow(
     column(3, wellPanel(
@@ -178,13 +179,13 @@ server <- function(input, output) {
       geom_segment(aes(x = conf.low, 
                        xend = conf.high, 
                        yend = y_point),
-                   color = mean_colors[3],
+                   color = "#003B5A", #mean_colors[3],
                    size = 1) + 
-        geom_point(aes(x = conf.low), size = 1, color = mean_colors[3]) +
-        geom_point(aes(x = conf.high), size = 1, color = mean_colors[3]) +
+        geom_point(aes(x = conf.low), size = 1, color = "#003B5A") + #mean_colors[3]) +
+        geom_point(aes(x = conf.high), size = 1, color = "#003B5A") + #mean_colors[3]) +
         geom_point(aes(x = estimate1 - estimate2),
                    shape = 17,
-                   color = mean_colors[3],
+                   color = "#003B5A", #mean_colors[3],
                    size = 3) +
       geom_segment(data = arrows_df,
                      aes(x = calc_xstart, 
@@ -193,12 +194,15 @@ server <- function(input, output) {
                          yend = 0.05),
                      arrow = arrow(ends = "first",
                                    type = "closed",
-                                   length = unit(2, "mm"))) +
+                                   length = unit(3, "mm")),
+                   color = "#003B5A") +
         geom_text(data = arrows_df,
                   aes(x = calc_xstart,
                       y = 0.05),
                   label = paste("t =", round(t_test()$statistic, 2)),
+                  color = "#003B5A",
                   vjust = 0,
+                  size = 6,
                   position = position_nudge(y = 0.01)) +
         labs(x = expression("Student's"~italic(t)),
              y = "Probability")
