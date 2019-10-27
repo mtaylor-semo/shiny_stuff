@@ -54,8 +54,9 @@ sample_genotypes <- function(react_list) {
 
 
 ui <- navbarPage(theme = "semo_mods.css",
-                 (title=div(img(src="semo_logo.png", height="70px"), 
-                            "Hardy-Weinberg practice")),
+                 windowTitle = "BI 163: Hardy-Weinberg practice",
+                 title=div(img(src="semo_logo.png", height="70px"), 
+                            "Hardy-Weinberg practice"),
   # Overview tab ------------------------------------------------------------
   
   tabPanel(
