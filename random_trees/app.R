@@ -12,10 +12,13 @@ library(phangorn)
 library(shinyjs)
 library(gtools)
 # Define UI for application that draws a histogram
-ui <- navbarPage(
+ui <- navbarPage(theme = "semo_mods.css",
+                 windowTitle = "BI 163: Tree-building practice",
+                 title=div(img(src="semo_logo.png", height="70px"), 
+                           "Tree-building practice"),
   
   # Application title
-  "BI 163 Tree-building practice",
+#  "BI 163 Tree-building practice",
   
   tabPanel(
     "Overview",
