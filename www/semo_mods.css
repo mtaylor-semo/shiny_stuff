@@ -16,30 +16,42 @@
 /* For now. May or may not keep */
 @import url(https://fonts.googleapis.com/css?family=Archivo+Black%7CLato:400,700);
 
-.navbar-default {font-family:"Archivo Black",Helvetica,Arial,sans-serif;}
+.navbar-default, .navbar-brand {font-family:"Archivo Black", Helvetica, Arial, 
+  sans-serif;}
 
-.navbar-default .navbar-brand {color: #000;}
 
+/*.navbar-nav .navbar-brand {
+   display: inline-block;
+   text-align: center; 
+   padding: 50px 0;
+}*/
+
+.navbar-default .navbar-brand {
+  padding-top:4px !important;
+  padding-bottom:4px !important;
+  height: 80px;
+  color: #000;
+}
+
+.navbar-nav > li > a {
+  padding-top:29px !important; 
+  padding-bottom:4px !important;
+  height: 80px;
+  vertical-align: center;
+  color: #000;
+}
+
+/*
 .navbar-nav > li > a, .navbar-brand {
                    padding-top:4px !important; 
                    padding-bottom:4px !important;
                    height: 80px;
+                   vertical-align: center;
+                   display: inline-block;
+                   color: #000;
                  }
-.navbar {min-height:78px !important;}
-
-/*
-.navbar { background-color: #262626;
-                           font-family: Arial;
-                           font-size: 13px;
-                           color: #FF0000; }
-.navbar-dropdown { background-color: #262626;
-                           font-family: Arial;
-                           font-size: 13px;
-                           color: #FF0000; }
-.navbar-default .navbar-brand {color: #cc3f3f;}
 */
-.navbar.navbar-default.navbar-static-top{color: #FFFF00 ;}
-
+.navbar {min-height:80px !important;}
 
 .semo_font {font-family:"Archivo Black",Helvetica,Arial,sans-serif;}
 
