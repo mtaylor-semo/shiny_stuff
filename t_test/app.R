@@ -41,9 +41,19 @@ t_range <- tibble(t = c(min_scale, max_scale))
 
 ui <-
   fluidPage(theme = "semo_mods.css",
-            # Application title
-            titlePanel(title=div(img(src="semo_logo.png", height="70px"), 
-            "Hypothesis testing: t-test")),
+#            tags$head(
+#              tags$style(
+#                ".myTitle {margin: auto; width: 400px}"
+#              )
+#            ),
+            tags$div(class = "semo_font", 
+                     titlePanel(title = div(img(src="semo_logo.png", 
+                                                height="70px"), 
+                                            "Hypothesis testing: t-test"))),
+#            tags$div(class="title", titlePanel("Centered title")),
+                      # Application title
+            #titlePanel(title=div(img(src="semo_logo.png", height="70px"), 
+            #"Hypothesis testing: t-test")),
   # First Row
   
   fluidRow(
@@ -64,8 +74,8 @@ ui <-
       value = 25,
       step = 1
     ),
-    p("One sample has a mean of about 68. Change the slider
-       to set the mean for the second (variable) sample. Change the slider
+    p("The fixed sample has a mean of about 68. Change the upper slider
+       to set the mean for the variable sample. Change the lower slider
        to change the same size for each sample"
     ),
     p("TO DO: Add a Resample button.")
@@ -80,10 +90,10 @@ ui <-
            p("The curve at right shows the", em("t"), "distribution 
              for ", textOutput("t_df", inline = TRUE), "degrees of freedom."),
            
-           p("The triangle and horizontal line above the curve show the difference between the 
-             two sample means (X", tags$sub("1", class="custom"), "– X", tags$sub("2", class="custom"), ") and
-             the 95% confidence limits. If the line spans across 0 (the peak of the t-curve),
-             then the samples were from the same statistical population."),
+           p(HTML("The triangle and horizontal line above the curve show the difference between the 
+             two sample means (Y&#772<sub>1</sub>–Y&#772<sub>2</sub>) and
+             the 95% confidence limits. If the line spans across 0 (peak of the curve),
+             then the samples were from the same statistical population.")),
            
            p("The ", em("t"), "-value is shown along the X-axis. MORE WORDS.")
     )),
