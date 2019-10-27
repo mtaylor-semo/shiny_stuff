@@ -53,17 +53,17 @@ sample_genotypes <- function(react_list) {
 # UI ----------------------------------------------------------------------
 
 
-ui <- navbarPage(
-  "BI 163 Hardy-Weinberg practice",
-  
+ui <- navbarPage(theme = "semo_mods.css",
+                 (title=div(img(src="semo_logo.png", height="70px"), 
+                            "Hardy-Weinberg practice")),
   # Overview tab ------------------------------------------------------------
   
   tabPanel(
     "Overview",
     mainPanel(
       helpText(
-        "This site presents Hardy-Weinberg problems so you
-        can practice and develop your problem-solving skills."
+        "This site presents Hardy-Weinberg problems for you to
+        practice and develop your problem-solving skills."
       ),
       helpText(
         "The \"Simple problems\" tab presents problems that
