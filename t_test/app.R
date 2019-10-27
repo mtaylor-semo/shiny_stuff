@@ -40,13 +40,14 @@ t_range <- tibble(t = c(min_scale, max_scale))
 # Shiny UI ----------------------------------------------------------------
 
 ui <-
-  fluidPage(theme = "semo_test.css",
+  fluidPage(theme = "semo_mods.css",
             # Application title
-            titlePanel(title=div(img(src="semo_logo.png", height="70px"), "T-test")),
+            titlePanel(title=div(img(src="semo_logo.png", height="70px"), 
+            "Hypothesis testing: t-test")),
   # First Row
   
   fluidRow(
-    column(3, wellPanel(
+    column(4, wellPanel(
     sliderInput(
       "tall_mean",
       "Mean of variable population:",
@@ -69,17 +70,26 @@ ui <-
     ),
     p("TO DO: Add a Resample button.")
   )),
-  column(7, offset = 1,
+  column(7,
          plotOutput("densityPlot")
   )),
-  tags$hr(class = "custom"),
+  tags$hr(),
   # Second row
   fluidRow(
-    column(3, wellPanel(
-           p("TO DO: Add info on how to interpret the arrow and the range encompassing zero.")
+    column(4, wellPanel(
+           p("The curve at right shows the", em("t"), "distribution 
+             for ", textOutput("t_df", inline = TRUE), "degrees of freedom."),
+           
+           p("The triangle and horizontal line above the curve show the difference between the 
+             two sample means (X", tags$sub("1", class="custom"), "– X", tags$sub("2", class="custom"), ") and
+             the 95% confidence limits. If the line spans across 0 (the peak of the t-curve),
+             then the samples were from the same statistical population."),
+           
+           p("The ", em("t"), "-value is shown along the X-axis. MORE WORDS.")
     )),
-    column(7, offset = 1,
+    column(7,
            plotOutput("tPlot")
+           #textOutput("t_df")
     )
   )
 )
@@ -112,9 +122,10 @@ server <- function(input, output) {
                 var.equal = TRUE))
   })
   
-
+  output$t_df <- renderText(round(t_test()$parameter, 2))
 # Upper plot: two normal distribs -----------------------------------------
 
+  
   
   output$densityPlot <- renderPlot({
     
@@ -135,7 +146,10 @@ server <- function(input, output) {
       labs(x = "Mean", 
            y = "Probability",
            fill = "Sample",
-           title = paste("t =", t_value, "with", degrees_freedom, "degrees of freedom"))
+           title = paste("t =", t_value, "with", degrees_freedom, "degrees of freedom")) +
+      theme(axis.title = element_text(size = 18),
+            title = element_text(size = 14),
+            axis.text = element_text(size = 14))
 #      ggtitle(paste("t =", t_value, "with", degrees_freedom, "degrees of freedom"))
   })
 
@@ -179,13 +193,13 @@ server <- function(input, output) {
       geom_segment(aes(x = conf.low, 
                        xend = conf.high, 
                        yend = y_point),
-                   color = "#003B5A", #mean_colors[3],
+                   color = "#9D2235", #mean_colors[3],
                    size = 1) + 
-        geom_point(aes(x = conf.low), size = 1, color = "#003B5A") + #mean_colors[3]) +
-        geom_point(aes(x = conf.high), size = 1, color = "#003B5A") + #mean_colors[3]) +
+        geom_point(aes(x = conf.low), size = 1, color = "#9D2235") + #mean_colors[3]) +
+        geom_point(aes(x = conf.high), size = 1, color = "#9D2235") + #mean_colors[3]) +
         geom_point(aes(x = estimate1 - estimate2),
                    shape = 17,
-                   color = "#003B5A", #mean_colors[3],
+                   color = "#9D2235", #mean_colors[3],
                    size = 3) +
       geom_segment(data = arrows_df,
                      aes(x = calc_xstart, 
@@ -195,17 +209,20 @@ server <- function(input, output) {
                      arrow = arrow(ends = "first",
                                    type = "closed",
                                    length = unit(3, "mm")),
-                   color = "#003B5A") +
+                   color = "#9D2235") +
         geom_text(data = arrows_df,
                   aes(x = calc_xstart,
                       y = 0.05),
                   label = paste("t =", round(t_test()$statistic, 2)),
-                  color = "#003B5A",
+                  color = "#9D2235",
                   vjust = 0,
                   size = 6,
                   position = position_nudge(y = 0.01)) +
         labs(x = expression("Student's"~italic(t)),
-             y = "Probability")
+             y = "Probability") +
+        theme(axis.title = element_text(size = 18),
+              title = element_text(size = 14),
+              axis.text = element_text(size = 14))
   })  
   
 }
