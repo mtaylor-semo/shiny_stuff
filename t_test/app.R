@@ -49,7 +49,8 @@ ui <-
             tags$div(class = "semo_font", 
                      titlePanel(title = div(img(src="semo_logo.png", 
                                                 height="70px"), 
-                                            "Hypothesis testing: t-test"))),
+                                            "Hypothesis testing: t-test"),
+                                windowTitle = "BI 163: t-test")),
 #            tags$div(class="title", titlePanel("Centered title")),
                       # Application title
             #titlePanel(title=div(img(src="semo_logo.png", height="70px"), 
