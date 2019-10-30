@@ -1,0 +1,104 @@
+/*!
+ * bootswatch v3.3.7
+ * Homepage: http://bootswatch.com
+ * Copyright 2012-2016 Thomas Park
+ * Licensed under MIT
+ * Based on Bootstrap
+*//*!
+ * Bootstrap v3.3.7 (http://getbootstrap.com)
+ * Copyright 2011-2016 Twitter, Inc.
+ * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
+ *//*! normalize.css v3.0.3 | MIT License | github.com/necolas/normalize.css *
+ */
+
+/* Override default Shiny bootstrap settings for a few items. */
+
+/* For now. May or may not keep */
+@import url(https://fonts.googleapis.com/css?family=Archivo+Black%7CLato:400,700);
+
+.navbar-default, .navbar-brand {font-family:"Archivo Black", Helvetica, Arial, 
+  sans-serif;}
+
+
+/*.navbar-nav .navbar-brand {
+   display: inline-block;
+   text-align: center; 
+   padding: 50px 0;
+}*/
+
+.navbar-default .navbar-brand {
+  padding-top:4px !important;
+  padding-bottom:4px !important;
+  height: 80px;
+  color: #000;
+}
+
+.navbar-nav > li > a {
+  padding-top:29px !important; 
+  padding-bottom:4px !important;
+  height: 80px;
+  vertical-align: center;
+  color: #000;
+}
+
+/*
+.navbar-nav > li > a, .navbar-brand {
+                   padding-top:4px !important; 
+                   padding-bottom:4px !important;
+                   height: 80px;
+                   vertical-align: center;
+                   display: inline-block;
+                   color: #000;
+                 }
+*/
+.navbar {min-height:80px !important;}
+
+.semo_font {font-family:"Archivo Black",Helvetica,Arial,sans-serif;}
+
+
+body {font-family:"Lato",Helvetica,Arial,sans-serif;
+  font-size:14px;
+  line-height:1.42857143;
+  color:#333;
+  background-color: #fff}
+
+hr.custom {border-color: #003B5A;}
+/* p {margin:0 0 10px;
+  color:#9D2235}  /* SEMO Cardiac */
+
+/*sub.custom{padding:0px;margin-right:-2px;}
+ */
+ 
+ /* Make subscripts in paragraphs look better */
+sub.custom{display: inline-block;
+/*vertical-align: sub; */
+font-size: 80%;
+padding: 0px;
+margin-right:-2px;
+margin-left:-2px;}
+ 
+/*.form-group .control-label{
+  color:#003B5A} /* SEMO Riverfront */
+
+/* This colors all sliders the same. Below allows individual coloring */
+.irs-bar, .irs-bar-edge, .irs-single {
+  background: #C8102E; /* SEMO Southeast Red*/
+  border: #003B5A;     /* SEMO Riverfront */
+  color: white;
+}
+
+.well {
+  border:1px solid #003B5A; /* SEMO Riverfront */
+}
+/*
+#.js-irs-0 .irs-single, .js-irs-0 .irs-bar-edge, .js-irs-0 .irs-bar {
+#background: #000069;
+#border-top: 1px solid #000039;
+#border-bottom: 1px solid }
+*/
+
+/* Slider colors 
+/* See https://stackoverflow.com/a/53592336/3832941 */
+/*[for=sample_size]+span>.irs>.irs-single, [for=sample_size]+span>.irs-bar-edge, [for=sample_size]+span>.irs-bar {background:var(--riverfront);} 
+[for=sample_size]{color:var(--plum);}*/
+

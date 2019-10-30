@@ -12,29 +12,32 @@ library(phangorn)
 library(shinyjs)
 library(gtools)
 # Define UI for application that draws a histogram
-ui <- navbarPage(
+ui <- navbarPage(theme = "semo_mods.css",
+                 windowTitle = "BI 163: Tree-building practice",
+                 title=div(img(src="semo_logo.png", height="70px"), 
+                           "Tree-building practice"),
   
   # Application title
-  "BI 163 Tree-building practice",
+#  "BI 163 Tree-building practice",
   
   tabPanel(
     "Overview",
     mainPanel(
-      helpText(
+      p(
         "This site presents two types of phylogenetic tree problems so you
         can practice your tree-building skills, for 5 to 12 taxa.", strong("Remember:"), "A taxon (plural: taxa) can represent a species, a family, or 
         any other taxonomic level. "
       ),
-      helpText(
+      p(
         "The \"Data First\" tab starts with a presence-absence (0/1) character matrix
         that you use as data to build a tree."
       ),
-      helpText(
+      p(
         "The \"Tree First\" tab starts with a phylogenetic tree that you use to 
         make the presence-absence (0/1) character matrix. This will help you think 
         about phylogenetic trees in a different way."
       ),
-      helpText(
+      p(
         strong("The phylogenetic trees will not show the root but you should draw the
                root on your trees.")
       )
@@ -50,7 +53,7 @@ ui <- navbarPage(
                   max = 12,
                   value = 7,
                   step = 1),
-      helpText("Choose the number of taxa and then press the `New dataset` button.
+      p("Choose the number of taxa and then press the `New dataset` button.
                 Draw the tree from resulting character matrix. Each row represents one taxon,
                indicated by T1, T2, etc. Each column repesents a character,
                indicated by C1, C2, etc. Click on `Show answer` to reveal the correct tree.
@@ -77,7 +80,7 @@ tabPanel("Tree First",
                        max = 12,
                        value = 7,
                        step = 1),
-           helpText("Choose the number of taxa and then press the `New tree` button.
+           p("Choose the number of taxa and then press the `New tree` button.
                     Build the character matrix from the resulting tree. Make each row 
                     represent one taxon, using T1, T2, etc. Make each column repesents 
                     one character, using C1, C2, etc. Click on `Show answer` to reveal the 

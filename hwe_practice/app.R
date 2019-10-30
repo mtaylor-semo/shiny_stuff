@@ -53,20 +53,19 @@ sample_genotypes <- function(react_list) {
 # UI ----------------------------------------------------------------------
 
 
-ui <- navbarPage(
-  "BI 163 Hardy-Weinberg practice",
-  
+ui <- navbarPage(theme = "semo_mods.css",
+                 windowTitle = "BI 163: Hardy-Weinberg practice",
+                 title=div(img(src="semo_logo.png", height="70px"), 
+                            "Hardy-Weinberg practice"),
   # Overview tab ------------------------------------------------------------
   
   tabPanel(
     "Overview",
     mainPanel(
-      helpText(
-        "This site presents Hardy-Weinberg problems so you
-        can practice and develop your problem-solving skills."
+      p("This site presents Hardy-Weinberg problems for you to
+        practice and develop your problem-solving skills."
       ),
-      helpText(
-        "The \"Simple problems\" tab presents problems that
+      p("The \"Simple problems\" tab presents problems that
         assumes a population",
         em("is"),
         "in
@@ -75,8 +74,7 @@ ui <- navbarPage(
         You then calculate the four remaining frequencies using
         the two Hardy-Weinberg equations shown below."
       ),
-      helpText(
-        "The \"Counting problems\" tab presents problems for you
+      p("The \"Counting problems\" tab presents problems for you
         to determine",
         em("if"),
         "a population is in
@@ -86,13 +84,13 @@ ui <- navbarPage(
         then compare the results to determine if the
         population is in equilibrium."
       ),
-      helpText(strong(
+      p(strong(
         "All problems assume a single gene with only
         two alleles."
       )),
-      hr(),
-      h5("Equations and things to remember"),
-      br(),
+      tags$hr(),
+      h4("Equations and things to remember"),
+      tags$br(),
       uiOutput("equations")
       )
       ),
@@ -103,8 +101,7 @@ ui <- navbarPage(
            sidebarLayout(
              sidebarPanel(
                withMathJax(),
-               helpText(
-                 "Press \"New problem\" for a new problem to solve. Press
+               p("Press \"New problem\" for a new problem to solve. Press
                  \"Show answer\" to see the solution. Refer to your notes
                  for details of the steps."
                ),
@@ -115,13 +112,12 @@ ui <- navbarPage(
                ),
              
              mainPanel(
-               helpText(
-                 "The frequency of one allele or one homozygous genotype is provided.
+               p("The frequency of one allele or one homozygous genotype is provided.
                  Calculate the four remaining frequencies using the two Hardy-Weinberg
                  equations, shown below left. The population is in Hardy-Weinberg equilibrium.
                  Each gene has only two alleles."
                ),
-               helpText(final_freq_warning),
+               p(final_freq_warning),
                hr(),
                htmlOutput("question"),
                hr(),
@@ -134,8 +130,7 @@ ui <- navbarPage(
   tabPanel("Counting problems",
            sidebarLayout(
              sidebarPanel(
-               helpText(
-                 "Press \"New problem\" for a new problem to solve. Press
+               p("Press \"New problem\" for a new problem to solve. Press
                  \"Show answer\" to see the solution. Refer to your notes
                  for details of the steps."
                ),
@@ -145,20 +140,19 @@ ui <- navbarPage(
                             "Show answer")
                ),
              mainPanel(
-               helpText(
-                 "Use the methods learned in class to calculate whether
+               p("Use the methods learned in class to calculate whether
                  this population is in Hardy-Weinberg equilibrium.
                  Use the observed number of each genotype to calculate
                  genotype frequencies and observed allele frequencies."
                ),
-               helpText(strong(
+               p(strong(
                  "Round each step to 3 digits after the decimal point."
                )),
-               helpText(final_freq_warning),
-               hr(),
+               p(final_freq_warning),
+               tags$hr(),
                textOutput("intro_counting"),
                htmlOutput("question_counting"),
-               hr(),
+               tags$hr(),
                htmlOutput("answer_counting"),
                uiOutput("check")
                )
@@ -167,7 +161,7 @@ ui <- navbarPage(
 tabPanel(withMathJax("\\(\\chi^2\\)"),
          sidebarLayout(
            sidebarPanel(
-             helpText(
+             p(
                "Press \"New problem\" for a new problem to solve. Press
                \"Show answer\" to see the solution. Refer to your notes
                for details of the steps."
