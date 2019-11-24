@@ -66,7 +66,7 @@ server <- function(input, output, session) {
   
   
   observeEvent(input$sample_data, {
-    samp <- rnorm(input$samp_size, mean = pop_mean, sd = pop_sd)
+    samp <- rnorm(as.numeric(input$sample_choice), mean = pop_mean, sd = pop_sd)
     samp_mean <- mean(samp)
     samp_sd <- round(sd(samp), 2)
     
@@ -106,8 +106,9 @@ server <- function(input, output, session) {
   bin_width = 0.2
   
   observeEvent(input$sample_population, {
+    N <- as.numeric(input$size_sample)
     samples <- matrix(rnorm(
-      input$number_samples * input$size_sample,
+      input$number_samples * N,
       mean = pop_mean,
       sd = pop_sd
     ))
@@ -123,7 +124,7 @@ server <- function(input, output, session) {
         ) +
         stat_function(
           fun = function(x)
-            dnorm(x, mean = pop_mean, sd = sd(samples)) * input$size_sample * input$number_samples * bin_width
+            dnorm(x, mean = pop_mean, sd = sd(samples)) * as.numeric(input$size_sample) * input$number_samples * bin_width
         )
     )
     
