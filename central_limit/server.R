@@ -10,7 +10,10 @@ base_plot <- ggplot(data = data.frame(x = c(7, 13)), aes(x)) +
   scale_x_continuous(breaks = 7:13) +
   theme_minimal() +
   theme(title = element_text(size = 14),
-        axis.text = element_text(size = 16))
+        axis.text = element_text(size = 14),
+        axis.title.x = element_text(size = 16)) +
+  theme(panel.grid = element_blank(),
+        axis.ticks = element_line(color = "gray"))
 
 p1 <- base_plot
 samp_num <- 0
@@ -38,7 +41,6 @@ observeEvent(input$sample_data, {
 
     plot_title <- sprintf("Number: %i.\nMean: %.2f.\nStd Dev: %.2f.", 
                           samp_num, samp_mean, samp_sd)
-  
   
   p1 <<- p1 + 
     geom_vline(aes(xintercept = samp_mean),
