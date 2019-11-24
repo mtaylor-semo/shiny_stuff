@@ -56,49 +56,65 @@ server <- function(input, output, session) {
   
   # Single Sample -----------------------------------------------------------
   
-  observeEvent(input$clear_data, {
-    output$normal_plot <- renderPlot(p1)
-    p1 <<- base_plot + curve_layer
-    samp_num <<- 0
-    grand_mean <<- 0
-    reset_count()
+#  get_sample <- function(){
+#     rnorm(as.numeric(input$sample_choice), mean = pop_mean, sd = pop_sd)
+#   }
+  one_sample <- eventReactive(input$sample_data, {
+#    get_sample()
+    rnorm(as.numeric(input$sample_choice), mean = pop_mean, sd = pop_sd)
   })
   
+  # observeEvent(input$clear_data, {
+  #   output$normal_plot <- renderPlot(the_plot())
+  #   p1 <<- base_plot + curve_layer
+  #   samp_num <<- 0
+  #   grand_mean <<- 0
+  #   reset_count()
+  # })
   
-  observeEvent(input$sample_data, {
-    samp <- rnorm(as.numeric(input$sample_choice), mean = pop_mean, sd = pop_sd)
-    samp_mean <- mean(samp)
-    samp_sd <- round(sd(samp), 2)
-    
+  samp_mean <- eventReactive(input$sample_data, {
+    mean(one_sample())
+  })
+  
+  samp_sd <- eventReactive(input$sample_data, {
+    sd(one_sample())
+  })
+  
+  samp_number <- eventReactive(input$sample_data, {
     samp_num <<- samp_num + 1
-    grand_mean <<- grand_mean + samp_mean
-    
+  })
+  observeEvent(input$sample_data, {
+#    samp_num <<- samp_num + 1
+    grand_mean <<- grand_mean + samp_mean()
+  })
+  
+  the_plot <- eventReactive(input$sample_data, {
     p1 <<- p1 +
-      geom_vline(aes(xintercept = samp_mean),
+      geom_vline(aes(xintercept = samp_mean()),
                  color = "grey50",
                  size = 0.5)
-    
-    p1 <- p1 +
-      geom_vline(aes(xintercept = samp_mean),
+    p1 +
+      geom_vline(aes(xintercept = samp_mean()),
                  color = "#9D2235",
                  size = 1.1)
-    
-    output$normal_plot <- renderPlot(p1)
+  })
+  
+    output$normal_plot <- renderPlot(the_plot())
     
     output$sample_count <-
-      renderText(paste(sample_count_str, sprintf("%i", samp_num)))
+      renderText(paste(sample_count_str, sprintf("%i", samp_number)))
     output$sample_mean <-
-      renderText(paste(sample_mean_str, sprintf("%.2f", samp_mean)))
+      renderText(paste(sample_mean_str, sprintf("%.2f", samp_mean())))
     output$standard_deviation <-
-      renderText(paste(std_dev_str, sprintf("%.2f", samp_sd)))
+      renderText(paste(std_dev_str, sprintf("%.2f", samp_sd())))
     
-    output$sample_means <-
-      renderText(sprintf(
-        "Mean of %i sample means: %.2f",
-        samp_num,
-        grand_mean / samp_num
-      ))
-  })
+#    output$sample_means <-
+#      renderText(sprintf(
+#        "Mean of %i sample means: %.2f",
+#        samp_num,
+#        grand_mean / samp_num
+#      ))
+  #})
   
   
   # Many samples ------------------------------------------------------------
