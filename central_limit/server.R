@@ -106,9 +106,8 @@ server <- function(input, output, session) {
   bin_width = 0.2
   
   observeEvent(input$sample_population, {
-    N <- as.numeric(input$size_sample)
     samples <- matrix(rnorm(
-      input$number_samples * N,
+      as.numeric(input$number_samples) * as.numeric(input$size_sample),
       mean = pop_mean,
       sd = pop_sd
     ))
@@ -124,14 +123,14 @@ server <- function(input, output, session) {
         ) +
         stat_function(
           fun = function(x)
-            dnorm(x, mean = pop_mean, sd = sd(samples)) * as.numeric(input$size_sample) * input$number_samples * bin_width
+            dnorm(x, mean = pop_mean, sd = sd(samples)) * as.numeric(input$size_sample) * as.numeric(input$number_samples) * bin_width
         )
     )
     
     output$mean_of_means <-
       renderText(sprintf(
         "Mean of %i sample means: %.2f",
-        input$number_samples,
+        as.numeric(input$number_samples),
         mean(samples)
       ))
   })
