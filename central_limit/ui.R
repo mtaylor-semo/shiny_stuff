@@ -21,14 +21,19 @@ ui <- navbarPage(
   tabPanel("Single Samples",
            sidebarLayout(
              sidebarPanel(
-               sliderInput(
-                 "samp_size",
-                 "Sample Size",
-                 min = 10,
-                 max = 50,
-                 value = 10,
-                 step = 5
-               ),
+               radioButtons("sample_choice",
+                            "Sample Size",
+                            choices = c("10" = 10,
+                                        "30" = 30,
+                                        "100" = 100)),
+               # sliderInput(
+               #   "samp_size",
+               #   "Sample Size",
+               #   min = 10,
+               #   max = 50,
+               #   value = 10,
+               #   step = 5
+               # ),
                actionButton("sample_data",
                             "Sample Data"),
                actionButton("clear_data",
@@ -51,6 +56,11 @@ ui <- navbarPage(
    tabPanel("Many Samples",
             sidebarLayout(
               sidebarPanel(
+                # radioButtons("size_sample",
+                #              "Sample size",
+                #              choices = c("10" = 10,
+                #                          "30" = 30,
+                #                          "100" = 100)),
                 sliderInput("size_sample",
                             "Sample Size",
                             min = 10,
