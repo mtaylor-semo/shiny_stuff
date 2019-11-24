@@ -34,5 +34,25 @@ ui <- navbarPage(
                tags$hr(),
                textOutput("sample_means")
              )
-           ))
-)
+           )),
+   tabPanel("Many Samples",
+            sidebarLayout(
+              sidebarPanel(
+                sliderInput("size_sample",
+                            "Sample Size",
+                            min = 10,
+                            max = 50,
+                            value = 10,
+                            step = 5),
+                sliderInput("number_samples",
+                                       "Number of Samples",
+                                       min = 100,
+                                       max = 1000,
+                                       value = 250,
+                                       step = 50),
+                           actionButton("sample_population",
+                                        "Sample Data")),
+              mainPanel(h4("Sample"),
+                        plotOutput("many_plot"))
+            )
+))
