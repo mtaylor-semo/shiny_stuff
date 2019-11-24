@@ -8,10 +8,16 @@ ui <- navbarPage(
     img(src = "semo_logo.png", height = "70px"),
     "Central Limit Theorem"
   ),
+
+# Overview Tab ------------------------------------------------------------
+#
   tabPanel("Overview",
            mainPanel(
              h2("Introduction to the Central Limit Theorem")
            )),
+  
+# Single Samples tab ------------------------------------------------------
+#
   tabPanel("Single Samples",
            sidebarLayout(
              sidebarPanel(
@@ -29,12 +35,19 @@ ui <- navbarPage(
                             "Clear Means")
              ),
              mainPanel(
-               h4("Sample"),
                plotOutput("normal_plot"),
+               tags$hr(),
+               tags$h5(textOutput("sample_count")),
+#               textOutput("sample_count"),
+               textOutput("sample_mean"),
+               textOutput("standard_deviation"),
                tags$hr(),
                textOutput("sample_means")
              )
            )),
+
+# Many samples tab --------------------------------------------------------
+#
    tabPanel("Many Samples",
             sidebarLayout(
               sidebarPanel(
@@ -52,7 +65,8 @@ ui <- navbarPage(
                                        step = 50),
                            actionButton("sample_population",
                                         "Sample Data")),
-              mainPanel(h4("Sample"),
-                        plotOutput("many_plot"))
+              mainPanel(plotOutput("many_plot"),
+                        tags$hr(),
+                        textOutput("mean_of_means"))
             )
 ))
