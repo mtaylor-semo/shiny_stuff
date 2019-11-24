@@ -8,7 +8,7 @@ pop_mean = 10 # Population mean
 pop_sd = 1.5  # Population std dev.
 
 sample_count_str <- "Sample"
-sample_mean_str <- "Mean:"
+str_mean <- "Mean:"
 std_dev_str <- "Standard deviation:"
 
 # Idea for using stat_function to plot the normal curve
@@ -35,41 +35,35 @@ curve_layer <-
 
 p1 <- base_plot + curve_layer
 
-#grand_mean <- 0
-
 server <- function(input, output, session) {
 
+  ## Reactive values
   samp_num <- reactiveVal(0)
   grand_mean <- reactiveVal(0)
+  mean_str <- reactiveVal("Mean:")
+  sd_str <- reactiveVal("Standard deviation:")
   
   output$normal_plot <- renderPlot(the_plot())
   
   output$many_plot <- renderPlot(base_plot)
-  
-  output$sample_count <- renderText(sample_count_str)
-  output$sample_mean <- renderText(sample_mean_str)
-  output$standard_deviation <- renderText(std_dev_str)
-  
-  reset_count <- eventReactive(input$clear_data, {
-    output$sample_count <- renderText(sample_count_str)
-    output$sample_mean <- renderText(sample_mean_str)
-    output$standard_deviation <- renderText(std_dev_str)
-    output$sample_means <- renderText("")
-  })
-  
+
+
   # Single Sample -----------------------------------------------------------
   
   one_sample <- eventReactive(input$sample_data, {
     rnorm(as.numeric(input$sample_choice), mean = pop_mean, sd = pop_sd)
   })
   
-  # observeEvent(input$clear_data, {
-  #   output$normal_plot <- renderPlot(the_plot())
-  #   p1 <<- base_plot + curve_layer
-  #   samp_num <<- 0
-  #   grand_mean <<- 0
-  #   reset_count()
-  # })
+  observeEvent(input$clear_data, {
+    output$normal_plot <- renderPlot(the_plot())
+    p1 <<- base_plot + curve_layer
+    samp_num(0)# <<- 0
+    grand_mean(0)# <<- 0
+    mean_str("Mean:")
+    sd_str("Standard deviation:")
+    output$sample_mean <- renderText(mean_str())
+    output$standard_deviation <- renderText(sd_str())
+  })
   
   samp_mean <- eventReactive(input$sample_data, {
     mean(one_sample())
@@ -82,6 +76,8 @@ server <- function(input, output, session) {
   observeEvent(input$sample_data, {
     samp_num(samp_num() + 1)
     grand_mean(grand_mean() + samp_mean())
+    mean_str(sprintf("Mean: %.2f", samp_mean()))
+    sd_str(sprintf("Standard deviation: %.2f", samp_sd()))
   })
   
   the_plot <- eventReactive(input$sample_data, {
@@ -100,17 +96,21 @@ server <- function(input, output, session) {
     output$sample_count <-
       renderText(paste(sample_count_str, sprintf("%i", samp_num())))
     output$sample_mean <-
-      renderText(paste(sample_mean_str, sprintf("%.2f", samp_mean())))
+      renderText(mean_str())
     output$standard_deviation <-
-      renderText(paste(std_dev_str, sprintf("%.2f", samp_sd())))
-    
-#    output$sample_means <-
-#      renderText(sprintf(
-#        "Mean of %i sample means: %.2f",
-#        samp_num,
-#        grand_mean / samp_num
-#      ))
-  #})
+      renderText(sd_str())
+
+    observe(
+   output$sample_means <-
+     if (samp_num() > 0) {
+     renderText(sprintf(
+       "Mean of %i sample means: %.2f",
+       samp_num(),
+       grand_mean() / samp_num()
+     )) } else {
+       renderText("")
+     })
+
   
   
   # Many samples ------------------------------------------------------------
