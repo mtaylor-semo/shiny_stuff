@@ -7,7 +7,7 @@ library(shiny)
 pop_mean = 10 # Population mean
 pop_sd = 1.5  # Population std dev.
 
-sample_count_str <- "Sample"
+#sample_count_str <- "Sample"
 #str_mean <- "Mean:"
 #std_dev_str <- "Standard deviation:"
 
@@ -33,8 +33,6 @@ curve_layer <-
                 n = 101,
                 args = list(mean = pop_mean, sd = pop_sd))
 
-
-
 # Begin Server ------------------------------------------------------------
 #
 server <- function(input, output, session) {
@@ -52,14 +50,14 @@ server <- function(input, output, session) {
     past_means$df <- data.frame(means = numeric(0))
   }
   past_means$df <- reset_means()
-
+  
   output$many_plot <- renderPlot(base_plot)
   
   
   # Single Sample -----------------------------------------------------------
   
   one_sample <- eventReactive(input$sample_data, {
-    rnorm(as.numeric(input$sample_choice),
+    rnorm(as.numeric(input$sample_size_single),
           mean = pop_mean,
           sd = pop_sd)
   })
@@ -71,7 +69,7 @@ server <- function(input, output, session) {
   samp_sd <- eventReactive(input$sample_data, {
     sd(one_sample())
   })
-
+  
   observeEvent(input$clear_data, {
     samp_num(0)
     grand_mean(0)
@@ -87,7 +85,7 @@ server <- function(input, output, session) {
     grand_mean(grand_mean() + samp_mean())
     mean_str(sprintf("Mean: %.2f", samp_mean()))
     sd_str(sprintf("Standard deviation: %.2f", samp_sd()))
-    past_means$df[samp_num(), ] <- samp_mean()
+    past_means$df[samp_num(),] <- samp_mean()
   })
   
   output$normal_plot <- renderPlot({
@@ -133,32 +131,57 @@ server <- function(input, output, session) {
   
   observeEvent(input$sample_population, {
     samples <- matrix(rnorm(
-      as.numeric(input$number_samples) * as.numeric(input$size_sample),
+      as.numeric(input$number_samples) * as.numeric(input$sample_size_many),
       mean = pop_mean,
       sd = pop_sd
     ))
     sample_means <- data.frame(means = apply(samples, 1, mean))
     
-    output$many_plot <- renderPlot(
+    samp_size <- input$sample_size_many
+    samp_total <- input$number_samples
+    
+    output$many_plot <- renderPlot(if (samp_size != input$sample_size_many ||
+                                       samp_total != input$number_samples) {
+      base_plot
+    } else {
       base_plot +
         geom_histogram(
           data = sample_means,
           aes(x = means),
           color = "grey",
+          fill = "grey60",
           binwidth = bin_width
         ) +
         stat_function(
           fun = function(x)
-            dnorm(x, mean = pop_mean, sd = sd(samples)) * as.numeric(input$size_sample) * as.numeric(input$number_samples) * bin_width
+            dnorm(x, mean = pop_mean, sd = pop_sd) * as.numeric(input$sample_size_many) * as.numeric(input$number_samples) * bin_width
         )
-    )
+    })
     
     output$mean_of_means <-
-      renderText(sprintf(
-        "Mean of %i sample means: %.2f",
-        as.numeric(input$number_samples),
-        mean(samples)
-      ))
+      renderText(if (samp_size != input$sample_size_many ||
+                     samp_total != input$number_samples)
+      {
+        "" # Empty string
+      } else {
+        sprintf(
+          "Mean of %i sample means: %.2f",
+          as.numeric(input$number_samples),
+          mean(samples)
+        )
+      })
+    output$sd_of_means <-
+      renderText(if (samp_size != input$sample_size_many ||
+                     samp_total != input$number_samples)
+      {
+        "" # Empty string
+      } else {
+        sprintf(
+          "Variance of %i sample means: %.4f",
+          as.numeric(input$number_samples),
+          var(sample_means$means) / as.numeric(input$number_samples)
+        )
+      })
   })
   
 } # End server()

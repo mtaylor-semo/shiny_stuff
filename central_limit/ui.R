@@ -11,7 +11,7 @@ ui <- navbarPage(
 
 # Overview Tab ------------------------------------------------------------
 #
-  tabPanel("Overview",
+        tabPanel("Overview",
            mainPanel(
              h2("Introduction to the Central Limit Theorem")
            )),
@@ -26,14 +26,6 @@ ui <- navbarPage(
                             choices = c("10" = "10",
                                         "30" = "30",
                                         "100" = "100")),
-               # sliderInput(
-               #   "samp_size",
-               #   "Sample Size",
-               #   min = 10,
-               #   max = 50,
-               #   value = 10,
-               #   step = 5
-               # ),
                actionButton("sample_data",
                             "Sample Data"),
                actionButton("clear_data",
@@ -43,7 +35,6 @@ ui <- navbarPage(
                plotOutput("normal_plot"),
                tags$hr(),
                tags$h5(textOutput("sample_count")),
-#               textOutput("sample_count"),
                textOutput("sample_mean"),
                textOutput("standard_deviation"),
                tags$hr(),
@@ -56,7 +47,7 @@ ui <- navbarPage(
    tabPanel("Many Samples",
             sidebarLayout(
               sidebarPanel(
-                radioButtons("size_sample",
+                radioButtons("sample_size_many",
                              "Sample size",
                              choices = c("10" = "10",
                                          "30" = "30",
@@ -71,6 +62,7 @@ ui <- navbarPage(
                                         "Sample Data")),
               mainPanel(plotOutput("many_plot"),
                         tags$hr(),
-                        textOutput("mean_of_means"))
+                        textOutput("mean_of_means"),
+                        textOutput("sd_of_means"))
             )
 ))
