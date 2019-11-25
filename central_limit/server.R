@@ -48,17 +48,11 @@ server <- function(input, output, session) {
   
   
   past_means <- reactiveValues()
-  #  past_means$df <- data.frame(means = numeric(0))
   reset_means <- function() {
     past_means$df <- data.frame(means = numeric(0))
   }
-  
   past_means$df <- reset_means()
-  
-  
-  ggObj <- reactiveValues(base = base_plot,
-                          curve = curve_layer)
-  
+
   output$many_plot <- renderPlot(base_plot)
   
   
@@ -78,23 +72,6 @@ server <- function(input, output, session) {
     sd(one_sample())
   })
 
-  the_plot <- eventReactive(input$sample_data, {
-    if (samp_num() == 0) {
-      ggObj$base + ggObj$curve
-    } else {
-      ggObj$base + ggObj$curve +
-        geom_vline(
-          data = past_means$df,
-          aes(xintercept = means),
-          color = "grey50",
-          size = 0.5
-        ) +
-        geom_vline(aes(xintercept = samp_mean()),
-                   color = "#9D2235",
-                   size = 1.1)
-    }
-  }, ignoreNULL = FALSE)
-  
   observeEvent(input$clear_data, {
     samp_num(0)
     grand_mean(0)
@@ -113,7 +90,22 @@ server <- function(input, output, session) {
     past_means$df[samp_num(), ] <- samp_mean()
   })
   
-  output$normal_plot <- renderPlot(the_plot())
+  output$normal_plot <- renderPlot({
+    if (samp_num() == 0) {
+      base_plot + curve_layer
+    } else {
+      base_plot + curve_layer +
+        geom_vline(
+          data = past_means$df,
+          aes(xintercept = means),
+          color = "grey50",
+          size = 0.5
+        ) +
+        geom_vline(aes(xintercept = samp_mean()),
+                   color = "#9D2235",
+                   size = 1.1)
+    }
+  })
   
   output$sample_count <-
     renderText(sprintf("Sample %i", samp_num()))
