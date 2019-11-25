@@ -34,7 +34,7 @@ curve_layer <-
 server <- function(input, output, session) {
   session$onSessionEnded(stopApp)
   
-
+  
   ## Reactive variables
   samp_num <- reactiveVal(0)
   grand_mean <- reactiveVal(0)
@@ -88,7 +88,7 @@ server <- function(input, output, session) {
     grand_mean(grand_mean() + samp_mean())
     mean_str(sprintf("Mean: %.2f", samp_mean()))
     sd_str(sprintf("Standard deviation: %.2f", samp_sd()))
-    past_means$df[samp_num(),] <- samp_mean()
+    past_means$df[samp_num(), ] <- samp_mean()
   })
   
   output$normal_plot <- renderPlot({
@@ -130,32 +130,28 @@ server <- function(input, output, session) {
   
   
   # Many samples ------------------------------------------------------------
-  # This is broken. Everything is inside the observeEvent for sample pop.
-  # Don't think it should be like that. But, so far, that is only way I
-  # find to reset plot when changing radio buttons.
-  
+  # 
+
   bin_width = 0.2
   
-  observeEvent(input$sample_population, {
-    samples <- matrix(rnorm(
+  samples <- eventReactive(input$sample_population, {
+    matrix(rnorm(
       as.numeric(input$number_samples) * as.numeric(input$sample_size_many),
       mean = pop_mean,
       sd = pop_sd
     ))
-    sample_means <- data.frame(means = apply(samples, 1, mean))
-  #})
+  })
   
-    samp_size_many <- reactiveVal(input$sample_size_many)
-    samp_total <- reactiveVal(input$number_samples)
-
   
-    output$many_plot <- renderPlot(if (samp_size_many != input$sample_size_many ||
-                                       samp_total != input$number_samples) {
-      base_plot
-    } else {
+  sample_means <- eventReactive(input$sample_population, {
+    data.frame(means = apply(samples(), 1, mean))
+  })
+  
+  output$many_plot <-
+    renderPlot(
       base_plot +
         geom_histogram(
-          data = sample_means,
+          data = sample_means(),
           aes(x = means),
           color = "grey",
           fill = "grey60",
@@ -165,32 +161,19 @@ server <- function(input, output, session) {
           fun = function(x)
             dnorm(x, mean = pop_mean, sd = pop_sd) * as.numeric(input$sample_size_many) * as.numeric(input$number_samples) * bin_width
         )
-    })
-    
-    output$mean_of_means <-
-      renderText(if (samp_size_many != input$sample_size_many ||
-                     samp_total != input$number_samples)
-      {
-        "" # Empty string
-      } else {
-        sprintf(
-          "Mean of %i sample means: %.2f",
-          as.numeric(input$number_samples),
-          mean(samples)
-        )
-      })
-    output$sd_of_means <-
-      renderText(if (samp_size_many != input$sample_size_many ||
-                     samp_total != input$number_samples)
-      {
-        "" # Empty string
-      } else {
-        sprintf(
-          "Variance of %i sample means: %.4f",
-          as.numeric(input$number_samples),
-          var(sample_means$means) / as.numeric(input$number_samples)
-        )
-      })
-  })
+    )
   
+  output$mean_of_means <-
+    renderText(sprintf(
+      "Mean of %i sample means: %.2f",
+      as.numeric(input$number_samples),
+      mean(samples())
+    ))
+  output$sd_of_means <-
+    renderText(sprintf(
+      "Variance of %i sample means: %.4f",
+      as.numeric(input$number_samples),
+      var(samples()) / as.numeric(input$number_samples)
+    ))
+
 } # End server()
