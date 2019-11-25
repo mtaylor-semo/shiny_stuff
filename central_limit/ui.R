@@ -21,7 +21,7 @@ ui <- navbarPage(
   tabPanel("Single Samples",
            sidebarLayout(
              sidebarPanel(
-               radioButtons("sample_choice",
+               radioButtons("sample_size_single",
                             "Sample Size",
                             choices = c("10" = "10",
                                         "30" = "30",
