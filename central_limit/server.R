@@ -48,7 +48,7 @@ server <- function(input, output, session) {
   past_means$df <- reset_means()
   
   
-  clear_data <- function() {
+  clear_single_data <- function() {
     samp_num(0)
     grand_mean(0)
     mean_str("Mean:")
@@ -76,11 +76,11 @@ server <- function(input, output, session) {
   })
   
   observeEvent(input$clear_data, {
-    clear_data()
+    clear_single_data()
   })
   
   observeEvent(input$sample_size_single, {
-    clear_data()
+    clear_single_data()
   })
   
   observeEvent(input$sample_data, {
