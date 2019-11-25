@@ -7,10 +7,6 @@ library(shiny)
 pop_mean = 10 # Population mean
 pop_sd = 1.5  # Population std dev.
 
-#sample_count_str <- "Sample"
-#str_mean <- "Mean:"
-#std_dev_str <- "Standard deviation:"
-
 # Idea for using stat_function to plot the normal curve
 # https://sebastiansauer.github.io/normal_curve_ggplot2/
 
@@ -44,15 +40,11 @@ server <- function(input, output, session) {
   mean_str <- reactiveVal("Mean:")
   sd_str <- reactiveVal("Standard deviation:")
   
-  
   past_means <- reactiveValues()
   reset_means <- function() {
     past_means$df <- data.frame(means = numeric(0))
   }
   past_means$df <- reset_means()
-  
-  output$many_plot <- renderPlot(base_plot)
-  
   
   # Single Sample -----------------------------------------------------------
   
@@ -61,6 +53,7 @@ server <- function(input, output, session) {
           mean = pop_mean,
           sd = pop_sd)
   })
+  
   
   samp_mean <- eventReactive(input$sample_data, {
     mean(one_sample())
@@ -105,6 +98,7 @@ server <- function(input, output, session) {
     }
   })
   
+  
   output$sample_count <-
     renderText(sprintf("Sample %i", samp_num()))
   output$sample_mean <-
@@ -126,6 +120,9 @@ server <- function(input, output, session) {
   
   
   # Many samples ------------------------------------------------------------
+  # This is broken. Everything is inside the observeEvent for sample pop.
+  # Don't think it should be like that. But, so far, that is only way I
+  # find to reset plot when changing radio buttons.
   
   bin_width = 0.2
   
@@ -136,11 +133,13 @@ server <- function(input, output, session) {
       sd = pop_sd
     ))
     sample_means <- data.frame(means = apply(samples, 1, mean))
-    
-    samp_size <- input$sample_size_many
-    samp_total <- input$number_samples
-    
-    output$many_plot <- renderPlot(if (samp_size != input$sample_size_many ||
+  #})
+  
+    samp_size_many <- reactiveVal(input$sample_size_many)
+    samp_total <- reactiveVal(input$number_samples)
+
+  
+    output$many_plot <- renderPlot(if (samp_size_many != input$sample_size_many ||
                                        samp_total != input$number_samples) {
       base_plot
     } else {
@@ -159,7 +158,7 @@ server <- function(input, output, session) {
     })
     
     output$mean_of_means <-
-      renderText(if (samp_size != input$sample_size_many ||
+      renderText(if (samp_size_many != input$sample_size_many ||
                      samp_total != input$number_samples)
       {
         "" # Empty string
@@ -171,7 +170,7 @@ server <- function(input, output, session) {
         )
       })
     output$sd_of_means <-
-      renderText(if (samp_size != input$sample_size_many ||
+      renderText(if (samp_size_many != input$sample_size_many ||
                      samp_total != input$number_samples)
       {
         "" # Empty string
