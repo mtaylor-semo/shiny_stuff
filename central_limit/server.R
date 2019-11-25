@@ -34,6 +34,7 @@ curve_layer <-
 server <- function(input, output, session) {
   session$onSessionEnded(stopApp)
   
+
   ## Reactive variables
   samp_num <- reactiveVal(0)
   grand_mean <- reactiveVal(0)
@@ -45,6 +46,17 @@ server <- function(input, output, session) {
     past_means$df <- data.frame(means = numeric(0))
   }
   past_means$df <- reset_means()
+  
+  
+  clear_data <- function() {
+    samp_num(0)
+    grand_mean(0)
+    mean_str("Mean:")
+    sd_str("Standard deviation:")
+    output$sample_mean <- renderText(mean_str())
+    output$standard_deviation <- renderText(sd_str())
+    past_means <- reset_means()
+  }
   
   # Single Sample -----------------------------------------------------------
   
@@ -64,13 +76,11 @@ server <- function(input, output, session) {
   })
   
   observeEvent(input$clear_data, {
-    samp_num(0)
-    grand_mean(0)
-    mean_str("Mean:")
-    sd_str("Standard deviation:")
-    output$sample_mean <- renderText(mean_str())
-    output$standard_deviation <- renderText(sd_str())
-    past_means <- reset_means()
+    clear_data()
+  })
+  
+  observeEvent(input$sample_size_single, {
+    clear_data()
   })
   
   observeEvent(input$sample_data, {
