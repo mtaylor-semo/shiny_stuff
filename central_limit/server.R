@@ -8,8 +8,8 @@ pop_mean = 10 # Population mean
 pop_sd = 1.5  # Population std dev.
 
 sample_count_str <- "Sample"
-str_mean <- "Mean:"
-std_dev_str <- "Standard deviation:"
+#str_mean <- "Mean:"
+#std_dev_str <- "Standard deviation:"
 
 # Idea for using stat_function to plot the normal curve
 # https://sebastiansauer.github.io/normal_curve_ggplot2/
@@ -33,15 +33,13 @@ curve_layer <-
                 n = 101,
                 args = list(mean = pop_mean, sd = pop_sd))
 
-#first_plot <- base_plot + curve_layer
 
-#p1 <- base_plot + curve_layer
 
-# Begin Server
-
+# Begin Server ------------------------------------------------------------
+#
 server <- function(input, output, session) {
   session$onSessionEnded(stopApp)
-
+  
   ## Reactive variables
   samp_num <- reactiveVal(0)
   grand_mean <- reactiveVal(0)
@@ -50,22 +48,26 @@ server <- function(input, output, session) {
   
   
   past_means <- reactiveValues()
-  past_means$df <- data.frame(means = numeric(0))
-  
-  reset_means <- function(past_means) {
+  #  past_means$df <- data.frame(means = numeric(0))
+  reset_means <- function() {
     past_means$df <- data.frame(means = numeric(0))
   }
   
-  ggObj <- reactiveValues(base = base_plot, 
+  past_means$df <- reset_means()
+  
+  
+  ggObj <- reactiveValues(base = base_plot,
                           curve = curve_layer)
-
+  
   output$many_plot <- renderPlot(base_plot)
-
-
+  
+  
   # Single Sample -----------------------------------------------------------
   
   one_sample <- eventReactive(input$sample_data, {
-    rnorm(as.numeric(input$sample_choice), mean = pop_mean, sd = pop_sd)
+    rnorm(as.numeric(input$sample_choice),
+          mean = pop_mean,
+          sd = pop_sd)
   })
   
   samp_mean <- eventReactive(input$sample_data, {
@@ -75,20 +77,23 @@ server <- function(input, output, session) {
   samp_sd <- eventReactive(input$sample_data, {
     sd(one_sample())
   })
-  
+
   the_plot <- eventReactive(input$sample_data, {
     if (samp_num() == 0) {
       ggObj$base + ggObj$curve
     } else {
       ggObj$base + ggObj$curve +
-        geom_vline(data = past_means$df, aes(xintercept = means),
-                   color = "grey50",
-                   size = 0.5) +
+        geom_vline(
+          data = past_means$df,
+          aes(xintercept = means),
+          color = "grey50",
+          size = 0.5
+        ) +
         geom_vline(aes(xintercept = samp_mean()),
                    color = "#9D2235",
                    size = 1.1)
     }
-  }, ignoreNULL = FALSE) 
+  }, ignoreNULL = FALSE)
   
   observeEvent(input$clear_data, {
     samp_num(0)
@@ -97,41 +102,37 @@ server <- function(input, output, session) {
     sd_str("Standard deviation:")
     output$sample_mean <- renderText(mean_str())
     output$standard_deviation <- renderText(sd_str())
-#   output$normal_plot <- renderPlot(ggObj$base + ggObj$curve)
-#  output$normal_plot <- renderPlot(the_plot())
-        past_means <- reset_means(past_means)
-  }, ignoreNULL = FALSE)
+    past_means <- reset_means()
+  })
   
   observeEvent(input$sample_data, {
     samp_num(samp_num() + 1)
     grand_mean(grand_mean() + samp_mean())
     mean_str(sprintf("Mean: %.2f", samp_mean()))
     sd_str(sprintf("Standard deviation: %.2f", samp_sd()))
-    past_means$df[samp_num(),] <- samp_mean()
-#    print(past_means$df)
-#    print(the_plot())
+    past_means$df[samp_num(), ] <- samp_mean()
   })
   
-    output$normal_plot <- renderPlot(the_plot())
-
-    output$sample_count <-
-      renderText(paste(sample_count_str, sprintf("%i", samp_num())))
-    output$sample_mean <-
-      renderText(mean_str())
-    output$standard_deviation <-
-      renderText(sd_str())
-
-    observe(output$sample_means <-
-              if (samp_num() > 0) {
-                renderText(sprintf(
-                  "Mean of %i sample means: %.2f",
-                  samp_num(),
-                  grand_mean() / samp_num()
-                ))
-              } else {
-                renderText("")
-              })
-    
+  output$normal_plot <- renderPlot(the_plot())
+  
+  output$sample_count <-
+    renderText(sprintf("Sample %i", samp_num()))
+  output$sample_mean <-
+    renderText(mean_str())
+  output$standard_deviation <-
+    renderText(sd_str())
+  
+  observe(output$sample_means <-
+            if (samp_num() > 0) {
+              renderText(sprintf(
+                "Mean of %i sample means: %.2f",
+                samp_num(),
+                grand_mean() / samp_num()
+              ))
+            } else {
+              renderText("")
+            })
+  
   
   
   # Many samples ------------------------------------------------------------
