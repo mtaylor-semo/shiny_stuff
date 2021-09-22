@@ -1,3 +1,6 @@
+# Project specific files that can be ignored.
+biogeo/data/
+
 # History files
 .Rhistory
 .Rapp.history
