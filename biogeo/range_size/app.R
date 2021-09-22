@@ -56,9 +56,9 @@ ui <- fluidPage(
 
         # Show a plot of the generated distribution
         mainPanel(
-            dataTableOutput("state_taxa_table"),
-           verbatimTextOutput("states"),
-           verbatimTextOutput("taxa")
+           #dataTableOutput("state_taxa_table"),
+#           verbatimTextOutput("state_taxa_table"),
+           verbatimTextOutput("the_taxon")
         )
     )
 )
@@ -78,11 +78,21 @@ server <- function(input, output) {
                            choices = choices, 
                            selected = character(0))
     })
-    output$state_taxa_table <- renderDataTable({
-        state_taxa
+    
+    the_taxon <- reactive({
+        req(input$state)
+        filter(state_taxa, taxa == input$taxon)
     })
     
     
+    output$the_taxon <- renderPrint({
+        freezeReactiveValue(input, "the_taxon")
+        the_file <- state_taxa %>% 
+            filter(states == input$state() &&
+                       taxa == input$taxon())
+        the_file
+   })
+
     
     output$distPlot <- renderPlot({
         # generate bins based on input$bins from ui.R
