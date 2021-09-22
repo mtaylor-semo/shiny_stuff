@@ -1,5 +1,5 @@
 # Project specific files that can be ignored.
-biogeo/data/
+biogeo/range_size/data/*.csv
 
 # History files
 .Rhistory
