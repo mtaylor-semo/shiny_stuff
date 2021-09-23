@@ -13,12 +13,6 @@ library(dplyr)
 library(stringr)
 #library(magrittr)
 
-# Load data
-
-#spp <- read.csv("data/georgia_fishes.csv", 
-#                col_names = TRUE, #read_csv only
-#                row.names = 1)
-
 file_list <- list.files("data/")
 file_list_no_ext <- tools::file_path_sans_ext(file_list)
 
@@ -53,12 +47,9 @@ ui <- fluidPage(
                          choices = c("Crayfishes", "Fishes", "Mussels"))
         ),
 
-        # Show a plot of the generated distribution
+        # Show the histogram
         mainPanel(
-           #dataTableOutput("state_taxa_table"),
-#           verbatimTextOutput("state_taxa_table"),
-           #verbatimTextOutput("the_taxon")
-            plotOutput("the_state")
+            plotOutput("the_histogram")
         )
     )
 )
@@ -78,7 +69,7 @@ server <- function(input, output) {
                            choices = choices)
     })
     
-    output$the_state <- renderPlot({
+    output$the_histogram <- renderPlot({
         file_to_open <- paste0("data/",input$state, "_", input$taxon,".csv")
         spp <- read.csv(file_to_open, row.names = 1)
 
@@ -94,23 +85,7 @@ server <- function(input, output) {
         hist(numWatersheds, breaks=seq(0,nws,1), xlim = c(0,nws), xlab = 'Number of Watersheds', ylab = 'Number of Species', las=1, col = 'darkgray', border = 'white')
     })
     
-   #  the_taxon <- reactive({
-   #      req(input$state)
-   #      filter(state(), taxa == input$taxon)
-   #  })
-   #  
-   #  
-   #  observeEvent(the_taxon(), {
-   #      req(input$taxon)
-   #  })
-   #  
-   #  output$the_taxon <- renderPrint({
-   #      freezeReactiveValue(input, "the_taxon")
-   #      state_taxa %>% 
-   #          filter(states == input$state &
-   #                     taxa == input$taxon)
-   # })
-   # 
+
     
     output$distPlot <- renderPlot({
         # generate bins based on input$bins from ui.R
