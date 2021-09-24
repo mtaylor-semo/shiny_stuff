@@ -59,8 +59,9 @@ ui <- fluidPage(
 )
 
 # Define server logic required to draw a histogram
-server <- function(input, output) {
-
+server <- function(input, output, session) {
+    session$onSessionEnded(stopApp)
+    
     state <- reactive({
         filter(state_taxa, 
                states == input$state)
@@ -75,14 +76,14 @@ server <- function(input, output) {
     
     output$dynamic_radio_buttons <- renderUI({
         choices <- unique(state()$taxa)
-        freezeReactiveValue(input, "taxon1")
-        radioButtons(inputId = "taxon1", 
+        freezeReactiveValue(input, "taxon")
+        radioButtons(inputId = "taxon", 
                      "Choose a taxon", 
                      choices = choices) #c("Crayfishes", "Fishes", "Mussels"))
     })
     
     output$the_histogram <- renderPlot({
-        file_to_open <- paste0("data/",input$state, "_", input$taxon1,".csv")
+        file_to_open <- paste0("data/",input$state, "_", input$taxon,".csv")
         spp <- read.csv(file_to_open, row.names = 1)
 
         numWatersheds <- colSums(spp)
