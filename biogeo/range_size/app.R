@@ -12,7 +12,7 @@ library(ggplot2)
 
 # Define global variables here.
 
-file_list <- list.files("data/")
+file_list <- list.files("state_data/")
 file_list_no_ext <- tools::file_path_sans_ext(file_list)
 
 states <- file_list_no_ext %>%
@@ -32,12 +32,19 @@ state_taxa <- tibble(states, taxa)
 
 # Open the data set.
 
-open_file <- function(st, tx) {
+open_state_file <- function(st, tx) {
   # State and taxon
   the_state <- str_replace_all(st, " ", "_") # For two word states
-  file_to_open <- paste0("data/", the_state, "_", tx, ".csv")
+  file_to_open <- paste0("state_data/", the_state, "_", tx, ".csv")
   read.csv(file_to_open, row.names = 1)
 }
+
+open_na_file <- function(natx) {
+  # North American taxon
+  file_to_open <- paste0("na_data/na_", natx, ".csv")
+  read.csv(file_to_open, row.names = 1)
+}
+
 
 # UI ----------------------------------------------------------------------
 
@@ -69,7 +76,8 @@ ui <- navbarPage(
   tabPanel("State",
            sidebarLayout(
              sidebarPanel(
-               p("Choose your state and then taxon to see the histogram."
+               p("Choose your state and then taxon 
+                 to see the histogram."
                ),
                selectInput(inputId = "state",
                            label = "Choose a state", 
@@ -81,12 +89,7 @@ ui <- navbarPage(
              ),
              
              mainPanel(
-               plotOutput("the_histogram"),
-               p(), # A global variable was called here.
-               hr(),
-               htmlOutput("question"),
-               hr(),
-               htmlOutput("show_hist_result")
+               plotOutput("state_histogram")
              )
            )),
   
@@ -95,38 +98,22 @@ ui <- navbarPage(
   tabPanel("North America",
            sidebarLayout(
              sidebarPanel(
-               p(
-                 "Press \"New problem\" for a new problem to solve. Press
-                 \"Show answer\" to see the solution. Refer to your notes
-                 for details of the steps."
+               p("Range size for North America."
                ),
-               actionButton("button_three",
-                            "Button 3"),
-               actionButton("button_four",
-                            "Button 4")
-             ),
+               radioButtons("na_taxon", 
+                            label = "Choose taxon:",
+                            choices = c("Fishes", "Mussels"),
+                            selected = "Fishes"),
+               uiOutput("na_numbers")
+               ),
+             
+             
              mainPanel(
-               p(
-                 "Use the methods learned in class to calculate whether
-                 this population is in Hardy-Weinberg equilibrium.
-                 Use the observed number of each genotype to calculate
-                 genotype frequencies and observed allele frequencies."
-               ),
-               p(strong(
-                 "Round each step to 3 digits after the decimal point."
-               )),
-               p(),
-               # Global variable was called here.
-               tags$hr(),
-               textOutput("intro_counting"),
-               htmlOutput("question_counting"),
-               tags$hr(),
-               htmlOutput("answer_counting"),
-               uiOutput("check")
+               plotOutput("na_histogram")
              )
            )),
   # Chi-square problems  ---------------------------------------------------
-  tabPanel("Tab 3",
+  tabPanel("California Marine Fishes",
            sidebarLayout(
              sidebarPanel(
                p("A third tab if you need it."),
@@ -149,7 +136,7 @@ server <- function(input, output, session) {
            states == input$state)
   })
   
-  
+
   output$dynamic_radio_buttons <- renderUI({
     choices <- unique(state()$taxa)
     freezeReactiveValue(input, "taxon")
@@ -159,7 +146,11 @@ server <- function(input, output, session) {
   })
   
   spp <- reactive({
-    open_file(input$state, input$taxon)
+    open_state_file(input$state, input$taxon)
+  })
+  
+  spp_na <- reactive({
+    open_na_file(input$na_taxon)
   })
   
   output$state_numbers <- renderUI({
@@ -167,9 +158,14 @@ server <- function(input, output, session) {
     sprintf("This data set has %d watersheds and %d species.", dims[1], dims[2])
   })
   
-  # Output -----------------------------------------------------------
+  output$na_numbers <- renderUI({
+    dims <- dim(spp_na())
+    sprintf("This data set has %d watersheds and %d species.", dims[1], dims[2])
+  })
   
-  output$the_histogram <- renderPlot({
+    # Output -----------------------------------------------------------
+  
+  output$state_histogram <- renderPlot({
     numWatersheds <- colSums(spp())
     numSpecies <- rowSums(spp())
     bins <-
@@ -192,6 +188,28 @@ server <- function(input, output, session) {
       theme_minimal()
   })
   
+  output$na_histogram <- renderPlot({
+    numWatersheds <- colSums(spp_na())
+    numSpecies <- rowSums(spp_na())
+    bins <-
+      seq(min(numWatersheds), max(numWatersheds))#, length.out = input$bins + 1)
+    dat <- tibble(numWatersheds)
+    
+    nws <- nrow(spp_na())
+    #    highSp <- ceiling(max(numSpecies)/10)*10
+    
+    ggplot(dat, aes(x = numWatersheds)) +
+      geom_histogram(
+        binwidth = 5,
+        closed = "right",
+        breaks = seq(0, nws, 5),
+        color = "white"
+      ) +
+      xlab("Number of Watersheds") +
+      ylab("Number of Species") +
+      xlim(0, nws) +
+      theme_minimal()
+  })
 }
 
 # Run the application
