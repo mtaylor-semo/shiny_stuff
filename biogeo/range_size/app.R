@@ -65,8 +65,7 @@ ui <- navbarPage(
       p("Choose the State tab to begin. Choose the state and the
         taxon that was assigned to you."),
       p("NOTE TO MST: Rework the assignment to have students 
-        explore latitudal gradient, compare taxa within state, etc..."),
-      p(strong("Consider adding California marine taxa here."))
+        explore latitudal gradient, compare taxa within state, etc...")
     )
   ),
   
