@@ -112,17 +112,22 @@ ui <- navbarPage(
                plotOutput("na_histogram")
              )
            )),
-  # Chi-square problems  ---------------------------------------------------
+  
+
+  # California Marine Fishes ------------------------------------------------
+
   tabPanel("California Marine Fishes",
            sidebarLayout(
              sidebarPanel(
-               p("A third tab if you need it."),
-               actionButton("new_chi_problem",
-                            "New problem"),
-               actionButton("show_chi_answer",
-                            "Show answer")
+               radioButtons(inputId = "ca_marine",
+                            label = "Choose plot type",
+                            choices = c("Range size", "Range extent")
+                            ),
+               p("This data set has 516 species.")
              ),
-             mainPanel("Text for Tab 3 Main Panel")
+             mainPanel(
+               plotOutput("ca_marine_plot")
+             )
            )) # End chi tabPanel
 ) # end UI
 
@@ -135,7 +140,6 @@ server <- function(input, output, session) {
     filter(state_taxa,
            states == input$state)
   })
-  
 
   output$dynamic_radio_buttons <- renderUI({
     choices <- unique(state()$taxa)
@@ -163,7 +167,7 @@ server <- function(input, output, session) {
     sprintf("This data set has %d watersheds and %d species.", dims[1], dims[2])
   })
   
-    # Output -----------------------------------------------------------
+  # Output -----------------------------------------------------------
   
   output$state_histogram <- renderPlot({
     numWatersheds <- colSums(spp())
@@ -210,6 +214,102 @@ server <- function(input, output, session) {
       xlim(0, nws) +
       theme_minimal()
   })
+  
+  output$ca_marine_plot <- renderPlot({
+    cafish <- read.csv('marine/california_marine_fishes.csv', header=TRUE, row.names=1)
+    
+    if (input$ca_marine == "Range size") {
+      rangeSize <- rowSums(cafish)
+      numSpecies <- colSums(cafish)
+      
+      highSp <- ceiling(max(numSpecies)/10)*10
+      
+      max(rangeSize)	# maximum number of degrees latitude occupied
+      min(rangeSize)	# minimum number of degrees latitude occupied
+      mean(rangeSize)	# mean number of degrees latitude occupied
+      
+      dat <- tibble(rangeSize) 
+      ggplot(dat, aes(x = rangeSize)) +
+        geom_histogram(
+          closed = "right",
+          breaks = seq(0,100,5),
+          color = "white"
+        ) +
+        scale_x_continuous(breaks = seq(0,100,20)) +
+        xlab("Latitude (°N)") +
+        ylab("Number of Species") +
+        theme_minimal()
+    
+      # hist(rangeSize,
+      #      breaks=20,
+      #      xlim=c(0,100),
+      #      las=1,
+      #      ylab='Number of Species',
+      #      xlab = 'Latitude (°N)',
+      #      main='Frequency Distribution of Range Size\nCalifornia Coastal Marine Fishes')
+
+
+      
+      
+    } else { # plot 2
+      
+      mycolors <- c("#E69F00", "#56B4E9")
+      numRows <- nrow(cafish) ## number of species
+      numCols <- ncol(cafish) ## Number of 1° latitude cells
+      
+      meanCut <- 34.4481  ## Point Conception latitude as cutoff for northern and southern species.
+      
+      meanLat <- rep(NA,numRows) ## Create a vector same length as number of species.
+      
+      
+      #minLat <- rep(NA,numRows)
+      #maxLat <- rep(NA, numRows)
+      
+      minLat <- vector('numeric')
+      maxLat <- vector('numeric')
+      
+      for (i in 1:numRows) {
+        x <- data.frame(cafish)[i,]
+        y <- colnames(x)[x==1]
+        
+        #colNames <- colnames(y)
+        
+        colNames <- gsub('N','',y)
+        colNames <- gsub('S','-',colNames)
+        
+        minLat[i] <- as.numeric(colNames[1])
+        maxLat[i] <- as.numeric(colNames[length(colNames)])
+        #colNames <- as.numeric(colNames)
+        meanLat[i] <- mean(as.numeric(colNames))
+        
+      }
+      
+      cafish$minLat <- minLat
+      cafish$maxLat <- maxLat
+      cafish$meanLat <- meanLat
+      
+      latCol <- vector('character')
+      for (i in 1:numRows) {
+        if (cafish$meanLat[i] > meanCut){latCol[i] = mycolors[1]}
+        else { latCol[i] = mycolors[2]}	
+      } 
+      
+      cafish$latCol <- latCol
+      
+      cafish <- cafish[order(-cafish$minLat,-cafish$meanLat),]
+      
+      
+      plot(nrow(cafish),99, type='n', xlim=c(1,516), ylim=c(-30,68), ylab='Latitude (°S — °N)', xlab='Species Index', main='Latitudinal Range for\nCalifornia Coastal Marine Fishes')
+      for (i in 1:numRows){
+        segments(x0 = i, y0 = cafish$minLat[i], x1 = i, y1 <- cafish$maxLat[i], col=cafish$latCol[i])
+        
+      }
+      abline(h=36,col='gray')
+      abline(h=meanCut,col='gray3')
+      abline(h=32,col='gray')
+    }
+  })
+
 }
 
 # Run the application
