@@ -46,15 +46,15 @@ open_na_file <- function(natx) {
 }
 
 
-# UI ----------------------------------------------------------------------
+## UI ----------------------------------------------------------------------
 
 ui <- navbarPage(
   theme = "semo_mods.css",
-  windowTitle = "Biogeograpy: Range Size",
+  windowTitle = "Biogeograpy: Geographic Range Size",
   title = div(img(src = "semo_logo.png", height = "70px"),
-              "Range size"),
+              "Georgraphic range size"),
   
-  # Overview tab ------------------------------------------------------------
+# Overview tab ------------------------------------------------------------
   
   tabPanel(
     "Overview",
@@ -70,7 +70,7 @@ ui <- navbarPage(
   ),
   
 
-  # State tab ---------------------------------------------------------------
+# State tab ---------------------------------------------------------------
 
   tabPanel("State",
            sidebarLayout(
@@ -84,7 +84,9 @@ ui <- navbarPage(
                            selected = "Georgia",
                            multiple = FALSE),
                uiOutput("dynamic_radio_buttons"),
-               uiOutput("state_numbers")
+               uiOutput("state_numbers"),
+               hr(),
+               downloadButton('downloadReport')
              ),
              
              mainPanel(
@@ -92,7 +94,7 @@ ui <- navbarPage(
              )
            )),
   
-  # North America tab -------------------------------------------------------
+# North America tab -------------------------------------------------------
   
   tabPanel("North America",
            sidebarLayout(
@@ -113,7 +115,7 @@ ui <- navbarPage(
            )),
   
 
-  # California Marine Fishes ------------------------------------------------
+# California Marine Fishes ------------------------------------------------
 
   tabPanel("California Marine Fishes",
            sidebarLayout(
@@ -122,7 +124,9 @@ ui <- navbarPage(
                             label = "Choose plot type",
                             choices = c("Range size", "Range extent")
                             ),
-               p("This data set has 516 species.")
+               p("This data set has 516 species."),
+               hr(),
+               img(src = "california.png", width = "320px")
              ),
              mainPanel(
                plotOutput("ca_marine_plot")
@@ -135,10 +139,24 @@ ui <- navbarPage(
 server <- function(input, output, session) {
   session$onSessionEnded(stopApp)
   
+## Reactive values ---------------------------------------------------------
+  
   state <- reactive({
     filter(state_taxa,
            states == input$state)
   })
+
+  spp <- reactive({
+    open_state_file(input$state, input$taxon)
+  })
+  
+  spp_na <- reactive({
+    open_na_file(input$na_taxon)
+  })
+  
+  plots <- reactiveValues(state = NULL, na = NULL, ca = NULL)
+  
+## Outputs -------------------------------------------------------------
 
   output$dynamic_radio_buttons <- renderUI({
     choices <- unique(state()$taxa)
@@ -146,14 +164,6 @@ server <- function(input, output, session) {
     radioButtons(inputId = "taxon",
                  "Choose a taxon",
                  choices = choices) #c("Crayfishes", "Fishes", "Mussels"))
-  })
-  
-  spp <- reactive({
-    open_state_file(input$state, input$taxon)
-  })
-  
-  spp_na <- reactive({
-    open_na_file(input$na_taxon)
   })
   
   output$state_numbers <- renderUI({
@@ -166,19 +176,18 @@ server <- function(input, output, session) {
     sprintf("This data set has %d watersheds and %d species.", dims[1], dims[2])
   })
   
-  # Output -----------------------------------------------------------
+  
+## State histograms ------------------------------------------------------
   
   output$state_histogram <- renderPlot({
     numWatersheds <- colSums(spp())
     numSpecies <- rowSums(spp())
-    bins <-
-      seq(min(numWatersheds), max(numWatersheds))#, length.out = input$bins + 1)
-    dat <- tibble(numWatersheds)
     
     nws <- nrow(spp())
-    #    highSp <- ceiling(max(numSpecies)/10)*10
     
-    ggplot(dat, aes(x = numWatersheds)) +
+    #dat <- tibble(numWatersheds) # Need tibble for ggplot.
+    
+    plots$state <- ggplot(tibble(numWatersheds), aes(x = numWatersheds)) +
       geom_histogram(
         binwidth = 1,
         closed = "right",
@@ -189,18 +198,42 @@ server <- function(input, output, session) {
       ylab("Number of Species") +
       xlim(0, nws) +
       theme_minimal()
+    
+    plots$state
   })
+  
+  output$downloadReport <- downloadHandler(
+    filename = function() {
+      paste('my-report', sep = '.', 'pdf'
+      )
+    },
+    
+    content = function(file) {
+      src <- normalizePath('range_report.Rmd')
+      
+      # temporarily switch to the temp dir, in case you do not have write
+      # permission to the current working directory
+      owd <- setwd(tempdir())
+      on.exit(setwd(owd))
+      file.copy(src, 'range_report.Rmd', overwrite = TRUE)
+      
+      library(rmarkdown)
+      out <- render('range_report.Rmd', pdf_document()
+      )
+      file.rename(out, file)
+    }
+  )
+## North America histogram -------------------------------------------------
   
   output$na_histogram <- renderPlot({
     numWatersheds <- colSums(spp_na())
     numSpecies <- rowSums(spp_na())
     bins <-
-      seq(min(numWatersheds), max(numWatersheds))#, length.out = input$bins + 1)
+      seq(min(numWatersheds), max(numWatersheds))
     dat <- tibble(numWatersheds)
     
-    nws <- nrow(spp_na())
-    #    highSp <- ceiling(max(numSpecies)/10)*10
-    
+    nws <- nrow(spp_na()) # Number of watersheds for x-axis
+
     ggplot(dat, aes(x = numWatersheds)) +
       geom_histogram(
         binwidth = 5,
@@ -214,6 +247,9 @@ server <- function(input, output, session) {
       theme_minimal()
   })
   
+
+## California Marine plots -------------------------------------------------
+
   output$ca_marine_plot <- renderPlot({
     cafish <- read.csv('marine/california_marine_fishes.csv', header=TRUE, row.names=1)
     
@@ -238,19 +274,9 @@ server <- function(input, output, session) {
         xlab("Latitude (°N)") +
         ylab("Number of Species") +
         theme_minimal()
-    
-      # hist(rangeSize,
-      #      breaks=20,
-      #      xlim=c(0,100),
-      #      las=1,
-      #      ylab='Number of Species',
-      #      xlab = 'Latitude (°N)',
-      #      main='Frequency Distribution of Range Size\nCalifornia Coastal Marine Fishes')
-
-
       
       
-    } else { # plot 2
+    } else { # plot 2.  Need better checks for the if/else
       
       mycolors <- c("#E69F00", "#56B4E9")
       numRows <- nrow(cafish) ## number of species
@@ -260,10 +286,6 @@ server <- function(input, output, session) {
       
       meanLat <- rep(NA,numRows) ## Create a vector same length as number of species.
       
-      
-      #minLat <- rep(NA,numRows)
-      #maxLat <- rep(NA, numRows)
-      
       minLat <- vector('numeric')
       maxLat <- vector('numeric')
       
@@ -271,16 +293,12 @@ server <- function(input, output, session) {
         x <- data.frame(cafish)[i,]
         y <- colnames(x)[x==1]
         
-        #colNames <- colnames(y)
-        
         colNames <- gsub('N','',y)
         colNames <- gsub('S','-',colNames)
         
         minLat[i] <- as.numeric(colNames[1])
         maxLat[i] <- as.numeric(colNames[length(colNames)])
-        #colNames <- as.numeric(colNames)
         meanLat[i] <- mean(as.numeric(colNames))
-        
       }
       
       cafish$minLat <- minLat
