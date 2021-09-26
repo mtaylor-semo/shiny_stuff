@@ -7,6 +7,7 @@ library(readr)
 library(dplyr)
 library(stringr)
 library(ggplot2)
+#library(shinyjs)
 
 # Global variables --------------------------------------------------------
 
@@ -28,6 +29,14 @@ taxa <-
 
 state_taxa <- tibble(states, taxa)
 
+# Predefined tabs. See https://stackoverflow.com/a/60229331/3832941
+# I predefined the tabPanels here so that I didn't clutter the
+# server code.
+state_tab <- tabPanel("test_tab", 
+                      value = "tab2_val", 
+                      br(),
+                      h4("this is tab2"))
+
 # Global functions --------------------------------------------------------
 
 # Open the data set.
@@ -48,11 +57,11 @@ open_na_file <- function(natx) {
 
 ## UI ----------------------------------------------------------------------
 
-ui <- navbarPage(
+ui <- navbarPage(id = "tabs",
   theme = "semo_mods.css",
   windowTitle = "Biogeograpy: Geographic Range Size",
   title = div(img(src = "semo_logo.png", height = "70px"),
-              "Georgraphic range size"),
+              "Geographic range size"),
   
 # Overview tab ------------------------------------------------------------
   
@@ -68,7 +77,34 @@ ui <- navbarPage(
         explore latitudal gradient, compare taxa within state, etc...")
     )
   ),
-  
+
+# Predictions tab ---------------------------------------------------------
+
+  tabPanel(
+    "Predictions",
+    mainPanel(
+      textInput("student_name", "Enter your name:"),
+      p(),
+      hr(),
+      p(),
+      p("What do you predict for the state level? 
+        Will most species have small, moderate, or large range sizes?"),
+      textAreaInput("predict_state", "Enter your prediction in this space:", rows = 5),
+      p(),
+      hr(),
+      p("What do you predict for North America? 
+        Will most species have small, moderate, or large range sizes?"),
+      textAreaInput("predict_na", "Enter your prediction in this space:", rows = 5),
+      p(),
+      hr(),
+      p("What do you predict for the California marine fishes? 
+        Will most species have small, moderate, or large range sizes?"),
+      textAreaInput("predict_state", "Enter your prediction in this space:", rows = 5),
+      p(),
+      hr(),
+      actionButton(inputId = "next_pred", label = "Next")
+    )
+  ),
 
 # State tab ---------------------------------------------------------------
 
@@ -138,7 +174,9 @@ ui <- navbarPage(
 
 server <- function(input, output, session) {
   session$onSessionEnded(stopApp)
-  
+  hideTab("tabs", "State")
+  hideTab("tabs", "North America")
+  hideTab("tabs", "California Marine Fishes")
 ## Reactive values ---------------------------------------------------------
   
   state <- reactive({
@@ -155,6 +193,23 @@ server <- function(input, output, session) {
   })
   
   plots <- reactiveValues(state = NULL, na = NULL, ca = NULL)
+  
+
+# Button observers --------------------------------------------------------
+
+observeEvent(input$next_pred, {
+#  hideTab(inputId = "tabs", target = "Overview")
+  hideTab(inputId = "tabs", target = "Predictions")
+  showTab(inputId = "tabs", target = "State")
+  showTab(inputId = "tabs", target = "North America")
+  showTab(inputId = "tabs", target = "California Marine Fishes")
+  updateTabsetPanel(inputId = "tabs", selected = "State")
+  # See https://stackoverflow.com/a/60229331/3832941
+  # for solution on appending tabs. I predefined tabs
+  # up in global vars.
+ # appendTab(inputId = "tabs", state_tab)
+#  appendTab(inputId = "tabs", na_tab)
+})
   
 ## Outputs -------------------------------------------------------------
 
@@ -218,8 +273,8 @@ server <- function(input, output, session) {
       file.copy(src, 'range_report.Rmd', overwrite = TRUE)
       
       library(rmarkdown)
-      out <- render('range_report.Rmd', pdf_document()
-      )
+      out <- render('range_report.Rmd', 
+                    pdf_document())
       file.rename(out, file)
     }
   )
@@ -234,7 +289,7 @@ server <- function(input, output, session) {
     
     nws <- nrow(spp_na()) # Number of watersheds for x-axis
 
-    ggplot(dat, aes(x = numWatersheds)) +
+    plots$na <- ggplot(dat, aes(x = numWatersheds)) +
       geom_histogram(
         binwidth = 5,
         closed = "right",
@@ -245,6 +300,8 @@ server <- function(input, output, session) {
       ylab("Number of Species") +
       xlim(0, nws) +
       theme_minimal()
+    
+    plots$na
   })
   
 
@@ -264,7 +321,7 @@ server <- function(input, output, session) {
       mean(rangeSize)	# mean number of degrees latitude occupied
       
       dat <- tibble(rangeSize) 
-      ggplot(dat, aes(x = rangeSize)) +
+      plots$ca <- ggplot(dat, aes(x = rangeSize)) +
         geom_histogram(
           closed = "right",
           breaks = seq(0,100,5),
@@ -275,6 +332,7 @@ server <- function(input, output, session) {
         ylab("Number of Species") +
         theme_minimal()
       
+      plots$ca
       
     } else { # plot 2.  Need better checks for the if/else
       
