@@ -1,0 +1,41 @@
+---
+title: Geographic Range Size
+author: "`r input$student_name`"
+---
+Name: 
+
+For `r paste(input$state, input$taxon)`, you predicted:
+
+*`r input$predict_state`*
+
+**Consider inline output, like this:**
+
+For the state level, you predicted *`r input$predict_state`*
+
+For `r paste(input$na_taxon)`, you predicted:
+
+*`r input$predict_na`*
+
+For California marine fishes, you predicted:
+
+*`r input$predict_ca`*
+
+***
+
+Histogram of `r paste(input$state, input$taxon)` for geographic range size.
+
+```{r fig.dim=c(3,2), echo=FALSE}
+plots$state
+```
+
+Histogram of North American `r input$na_taxon` for geographic range size.
+
+```{r fig.dim=c(3,2), echo=FALSE}
+plots$na
+```
+
+Histogram of California Marine Fishes for geographic range size.
+
+```{r fig.dim=c(3,2), echo=FALSE}
+plots$na
+```
