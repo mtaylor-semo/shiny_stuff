@@ -2,6 +2,9 @@
 ## Show range size histograms for fishes, crayfishes, or mussels
 ## at state and North American levels.
 
+
+# Libraries ---------------------------------------------------------------
+
 library(shiny)
 library(readr)
 library(dplyr)
@@ -79,38 +82,88 @@ ui <- navbarPage(id = "tabs",
   ),
 
 # Predictions tab ---------------------------------------------------------
-
-  tabPanel(
-    "Predictions",
-    sidebarLayout(
-      sidebarPanel(
-        p("Enter your first and last name below,
-          and then enter your predictions at right."),
-        textInput("student_name", "Enter your name:", placeholder = "First Last"),
-        hr(),
-        p(),
-        p("After you have entered your predictions, press
-          the 'Next' button."),
-        actionButton(inputId = "next_pred", label = "Next")
-      ),
-    mainPanel(
-      p(),
-      p("What do you predict for the state level? 
-        Will most species have small, moderate, or large range sizes?"),
-      textAreaInput("predict_state", "Enter your prediction in this space:", rows = 5, placeholder = "State prediction…"),
-      p(),
-      hr(),
-      p("What do you predict for North America? 
-        Will most species have small, moderate, or large range sizes?"),
-      textAreaInput("predict_na", "Enter your prediction in this space:", rows = 5, placeholder = "North America prediction…"),
-      p(),
-      hr(),
-      p("What do you predict for the California marine fishes? 
-        Will most species have small, moderate, or large range sizes?"),
-      textAreaInput("predict_state", "Enter your prediction in this space:", rows = 5, placeholder = "California prediction…"),
-      p()
-    )
-  )),
+tabPanel("Predictions",
+         fluidRow(
+           column(
+             2,
+             textInput("student_name", 
+                       "Enter your name:", 
+                       placeholder = "First Last"),
+             hr(),
+             p(),
+             p("Enter your predictions at right, then press the 
+               'Next' button."),
+             actionButton(inputId = "next_pred", label = "Next")
+           ),
+           column(
+             4,
+             p("What do you predict for the state level? Will 
+               most species have small, moderate, or large range 
+               sizes?"
+             ),
+             textAreaInput(
+               "predict_state",
+               "Enter your prediction in this space:",
+               rows = 5,
+               placeholder = "State prediction…"
+             ),
+             p(),
+             hr(),
+             p("What do you predict for North America? Will 
+               most species have small, moderate, or large 
+               range sizes?"),
+             textAreaInput(
+               "predict_na",
+               "Enter your prediction in this space:",
+               rows = 5,
+               placeholder = "North America prediction…"
+             )
+           ),
+           column(
+             4,
+             p(
+               "What do you predict for the California marine 
+               fishes? Will most species have small, moderate, 
+               or large range sizes?"),
+             textAreaInput(
+               "predict_ca",
+               "Enter your prediction in this space:",
+               rows = 5,
+               placeholder = "California prediction…"
+             )
+           )
+         )),
+# tabPanel(
+#     "Predictions",
+#     sidebarLayout(
+#       sidebarPanel(
+#         p("Enter your first and last name below,
+#           and then enter your predictions at right."),
+#         textInput("student_name", "Enter your name:", placeholder = "First Last"),
+#         hr(),
+#         p(),
+#         p("After you have entered your predictions, press
+#           the 'Next' button."),
+#         actionButton(inputId = "next_pred", label = "Next")
+#       ),
+#     mainPanel(
+#       p(),
+#       p("What do you predict for the state level? 
+#         Will most species have small, moderate, or large range sizes?"),
+#       textAreaInput("predict_state", "Enter your prediction in this space:", rows = 5, placeholder = "State prediction…"),
+#       p(),
+#       hr(),
+#       p("What do you predict for North America? 
+#         Will most species have small, moderate, or large range sizes?"),
+#       textAreaInput("predict_na", "Enter your prediction in this space:", rows = 5, placeholder = "North America prediction…"),
+#       p(),
+#       hr(),
+#       p("What do you predict for the California marine fishes? 
+#         Will most species have small, moderate, or large range sizes?"),
+#       textAreaInput("predict_state", "Enter your prediction in this space:", rows = 5, placeholder = "California prediction…"),
+#       p()
+#     )
+#   )),
 
 # State tab ---------------------------------------------------------------
 
@@ -203,7 +256,8 @@ server <- function(input, output, session) {
 
 # Button observers --------------------------------------------------------
 
-observeEvent(input$next_pred, {
+  observeEvent(input$next_pred, {
+    req(input$student_name, input$predict_state, input$predict_na, input$predict_ca)
 #  hideTab(inputId = "tabs", target = "Overview")
   hideTab(inputId = "tabs", target = "Predictions")
   showTab(inputId = "tabs", target = "State")
@@ -216,6 +270,30 @@ observeEvent(input$next_pred, {
  # appendTab(inputId = "tabs", state_tab)
 #  appendTab(inputId = "tabs", na_tab)
 })
+  
+  output$downloadReport <- downloadHandler({
+    #req(input$student_name, input$predict_state, input$predict_na, input$predict_ca)
+#    req(input$predict_na)
+#    req(input$predict_ca)
+#    filename = function() {
+      paste('my-report', sep = '.', 'pdf')
+    },
+    
+    content = function(file) {
+      src <- normalizePath('range_report.Rmd')
+      
+      # temporarily switch to the temp dir, in case you do not have write
+      # permission to the current working directory
+      owd <- setwd(tempdir())
+      on.exit(setwd(owd))
+      file.copy(src, 'range_report.Rmd', overwrite = TRUE)
+      
+      library(rmarkdown)
+      out <- render('range_report.Rmd', 
+                    pdf_document())
+      file.rename(out, file)
+    }
+  )
   
 ## Outputs -------------------------------------------------------------
 
@@ -263,27 +341,6 @@ observeEvent(input$next_pred, {
     plots$state
   })
   
-  output$downloadReport <- downloadHandler(
-    filename = function() {
-      paste('my-report', sep = '.', 'pdf'
-      )
-    },
-    
-    content = function(file) {
-      src <- normalizePath('range_report.Rmd')
-      
-      # temporarily switch to the temp dir, in case you do not have write
-      # permission to the current working directory
-      owd <- setwd(tempdir())
-      on.exit(setwd(owd))
-      file.copy(src, 'range_report.Rmd', overwrite = TRUE)
-      
-      library(rmarkdown)
-      out <- render('range_report.Rmd', 
-                    pdf_document())
-      file.rename(out, file)
-    }
-  )
 ## North America histogram -------------------------------------------------
   
   output$na_histogram <- renderPlot({
