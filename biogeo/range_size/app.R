@@ -82,29 +82,35 @@ ui <- navbarPage(id = "tabs",
 
   tabPanel(
     "Predictions",
+    sidebarLayout(
+      sidebarPanel(
+        p("Enter your first and last name below,
+          and then enter your predictions at right."),
+        textInput("student_name", "Enter your name:", placeholder = "First Last"),
+        hr(),
+        p(),
+        p("After you have entered your predictions, press
+          the 'Next' button."),
+        actionButton(inputId = "next_pred", label = "Next")
+      ),
     mainPanel(
-      textInput("student_name", "Enter your name:"),
-      p(),
-      hr(),
       p(),
       p("What do you predict for the state level? 
         Will most species have small, moderate, or large range sizes?"),
-      textAreaInput("predict_state", "Enter your prediction in this space:", rows = 5),
+      textAreaInput("predict_state", "Enter your prediction in this space:", rows = 5, placeholder = "State prediction…"),
       p(),
       hr(),
       p("What do you predict for North America? 
         Will most species have small, moderate, or large range sizes?"),
-      textAreaInput("predict_na", "Enter your prediction in this space:", rows = 5),
+      textAreaInput("predict_na", "Enter your prediction in this space:", rows = 5, placeholder = "North America prediction…"),
       p(),
       hr(),
       p("What do you predict for the California marine fishes? 
         Will most species have small, moderate, or large range sizes?"),
-      textAreaInput("predict_state", "Enter your prediction in this space:", rows = 5),
-      p(),
-      hr(),
-      actionButton(inputId = "next_pred", label = "Next")
+      textAreaInput("predict_state", "Enter your prediction in this space:", rows = 5, placeholder = "California prediction…"),
+      p()
     )
-  ),
+  )),
 
 # State tab ---------------------------------------------------------------
 
