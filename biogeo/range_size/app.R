@@ -66,10 +66,10 @@ ui <- navbarPage(id = "tabs",
   title = div(img(src = "semo_logo.png", height = "70px"),
               "Geographic range size"),
   
-# Overview tab ------------------------------------------------------------
+# Instructions tab ------------------------------------------------------------
   
   tabPanel(
-    "Overview",
+    "Instructions",
     mainPanel(
       p("This app allows you to explore range sizes for three 
         aquatic groups (crayfishes, fishes, and mussels) for
@@ -92,8 +92,7 @@ tabPanel("Predictions",
              hr(),
              p(),
              p("Enter your predictions at right, then press the 
-               'Next' button."),
-             actionButton(inputId = "next_pred", label = "Next")
+               'Next' button.")
            ),
            column(
              4,
@@ -104,7 +103,7 @@ tabPanel("Predictions",
              textAreaInput(
                "predict_state",
                "Enter your prediction in this space:",
-               rows = 5,
+               rows = 4,
                placeholder = "State prediction…"
              ),
              p(),
@@ -115,22 +114,25 @@ tabPanel("Predictions",
              textAreaInput(
                "predict_na",
                "Enter your prediction in this space:",
-               rows = 5,
+               rows = 4,
                placeholder = "North America prediction…"
              )
            ),
            column(
              4,
-             p(
-               "What do you predict for the California marine 
+             p("What do you predict for the California marine 
                fishes? Will most species have small, moderate, 
                or large range sizes?"),
              textAreaInput(
                "predict_ca",
                "Enter your prediction in this space:",
-               rows = 5,
-               placeholder = "California prediction…"
-             )
+               rows = 4,
+               placeholder = "California prediction…"),
+             p(),
+             hr(),
+             p(),
+             actionButton(inputId = "next_pred", label = "Next"),
+             textOutput("prediction_error")
            )
          )),
 # tabPanel(
@@ -233,6 +235,14 @@ tabPanel("Predictions",
 
 server <- function(input, output, session) {
   session$onSessionEnded(stopApp)
+  
+  output$prediction_error <- renderText({
+  if(input$student_name  == "" | 
+     input$predict_state == "" |
+     input$predict_na == "" |
+     input$predict_ca == "") {"Must fill in all blanks."}
+  })
+  
   hideTab("tabs", "State")
   hideTab("tabs", "North America")
   hideTab("tabs", "California Marine Fishes")
@@ -257,19 +267,22 @@ server <- function(input, output, session) {
 # Button observers --------------------------------------------------------
 
   observeEvent(input$next_pred, {
-    req(input$student_name, input$predict_state, input$predict_na, input$predict_ca)
-#  hideTab(inputId = "tabs", target = "Overview")
-  hideTab(inputId = "tabs", target = "Predictions")
-  showTab(inputId = "tabs", target = "State")
-  showTab(inputId = "tabs", target = "North America")
-  showTab(inputId = "tabs", target = "California Marine Fishes")
-  updateTabsetPanel(inputId = "tabs", selected = "State")
-  # See https://stackoverflow.com/a/60229331/3832941
-  # for solution on appending tabs. I predefined tabs
-  # up in global vars.
- # appendTab(inputId = "tabs", state_tab)
-#  appendTab(inputId = "tabs", na_tab)
-})
+    req(input$student_name,
+        input$predict_state,
+        input$predict_na,
+        input$predict_ca)
+
+    hideTab(inputId = "tabs", target = "Predictions")
+    showTab(inputId = "tabs", target = "State")
+    showTab(inputId = "tabs", target = "North America")
+    showTab(inputId = "tabs", target = "California Marine Fishes")
+    updateTabsetPanel(inputId = "tabs", selected = "State")
+    # See https://stackoverflow.com/a/60229331/3832941
+    # for solution on appending tabs. I predefined tabs
+    # up in global vars.
+    # appendTab(inputId = "tabs", state_tab)
+    #  appendTab(inputId = "tabs", na_tab)
+  })
   
   output$downloadReport <- downloadHandler({
     #req(input$student_name, input$predict_state, input$predict_na, input$predict_ca)
