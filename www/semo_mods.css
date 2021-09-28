@@ -102,3 +102,7 @@ margin-left:-2px;}
 /*[for=sample_size]+span>.irs>.irs-single, [for=sample_size]+span>.irs-bar-edge, [for=sample_size]+span>.irs-bar {background:var(--riverfront);} 
 [for=sample_size]{color:var(--plum);}*/
 
+.shiny-notification-message {
+	background-color: #C8102E;;
+	color:white;
+}
