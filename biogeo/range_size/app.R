@@ -223,10 +223,11 @@ server <- function(input, output, session) {
 # Button observers --------------------------------------------------------
 
   observeEvent(input$next_pred, {
-    req(input$student_name,
-        input$predict_state,
-        input$predict_na,
-        input$predict_ca)
+    # Comment out for development.
+    pred_check(sn = input$student_name,
+               ps = input$predict_state,
+               pn = input$predict_na,
+               pc = input$predict_ca)
 
     hideTab(inputId = "tabs", target = "Predictions")
     showTab(inputId = "tabs", target = "State")

@@ -27,3 +27,9 @@ open_file <- function(tx, st = NULL) {
 #   read.csv(file_to_open, row.names = 1)
 # }
 # 
+
+## Prediction check. Move requirement check for predictions here.
+## sn = student_name, ps = pred_state, pn = pred_na, pc = pred_ca
+pred_check <- function(sn = NULL, ps = NULL, pn = NULL, pc = NULL) {
+  req(sn, ps, pn, pc)
+}
