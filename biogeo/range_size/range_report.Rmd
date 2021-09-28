@@ -1,24 +1,23 @@
 ---
-title: Geographic Range Size
-author: "`r input$student_name`"
+#title: Geographic Range Size
+#subtitle: Biogeography
+#author: "`r input$student_name`"
+mainfont: Linux Libertine O
+header-includes:
+  \usepackage{fontspec}
+  \setmainfont[Ligatures={Common,TeX}, Contextuals={NoAlternate}, BoldFont={* Bold}, ItalicFont={* Italic}, Numbers={OldStyle}]{Linux Libertine O}
+  \usepackage{microtype}
+  \usepackage[sc]{titlesec}
 ---
-Name: 
+\textsc{Biogeography: Geographic range size \hfill `r input$student_name`}
 
-For `r paste(input$state, input$taxon)`, you predicted:
+## Predictions
 
-*`r input$predict_state`*
+For `r paste(input$state, input$taxon)`, you wrote *`r input$predict_state`*
 
-**Consider inline output, like this:**
+For North American `r paste(input$na_taxon)`, you wrote *`r input$predict_na`*
 
-For the state level, you predicted *`r input$predict_state`*
-
-For `r paste(input$na_taxon)`, you predicted:
-
-*`r input$predict_na`*
-
-For California marine fishes, you predicted:
-
-*`r input$predict_ca`*
+For California marine fishes, you wrote *`r input$predict_ca`*
 
 ***
 
