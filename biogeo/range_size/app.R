@@ -129,7 +129,7 @@ tabPanel("State",
            column(1),
            column(
              2,
-             p("Choose your state and then taxon
+             wellPanel(p("Choose your state and then taxon
                  to see the histogram."),
              selectInput(
                inputId = "state",
@@ -143,7 +143,7 @@ tabPanel("State",
              uiOutput("state_numbers"),
              hr(),
              downloadButton('downloadReport')
-           ),
+           )),
            column(5, plotOutput("state_histogram")),
            column(2, p("Binwidth column"))
          )),
@@ -172,27 +172,27 @@ tabPanel("State",
   #            )
   #          )),
   # 
-# North America NEW -------------------------------------------------------
+# North America tab -------------------------------------------------------
 
 tabPanel("North America",
   fluidRow(
     column(1),
     column(
       2, 
-      p("Range size for North America."
+      wellPanel(p("Range size for North America."
       ),
       radioButtons("na_taxon", 
                    label = "Choose taxon:",
                    choices = c("Fishes", "Mussels"),
                    selected = "Fishes"),
       uiOutput("na_numbers")
-      ),
+      )),
     column(5, plotOutput("na_histogram")),
     column(2, p("text"))
     )
   ),
 
-# North America tab -------------------------------------------------------
+# North America OLD -------------------------------------------------------
   
   # tabPanel("North America OLD",
   #          sidebarLayout(
@@ -220,12 +220,12 @@ tabPanel("California Marine Fishes",
   fluidRow(
     column(1),
     column(2,
-           radioButtons(inputId = "ca_marine",
+           wellPanel(radioButtons(inputId = "ca_marine",
                         label = "Choose plot type",
                         choices = c("Range size", "Range extent")
            ),
            p("This data set has 516 species."),
-           ),
+           )),
     column(5, plotOutput("ca_marine_plot")),
     column(4, img(src = "california.png", width = "320px"))
   )
