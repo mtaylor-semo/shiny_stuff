@@ -60,14 +60,15 @@ open_na_file <- function(natx) {
 
 ## UI ----------------------------------------------------------------------
 
-ui <- navbarPage(id = "tabs",
-  theme = "semo_mods.css",
+ui <- tagList(
+  includeCSS("www/semo_mods.css"),
+             navbarPage(id = "tabs",
+#  theme = "semo_mods.css",
   windowTitle = "Biogeograpy: Geographic Range Size",
   title = div(img(src = "semo_logo.png", height = "70px"),
               "Geographic range size"),
-  
 # Instructions tab ------------------------------------------------------------
-  
+
   tabPanel(
     "Instructions",
     mainPanel(
@@ -131,41 +132,10 @@ tabPanel("Predictions",
              p(),
              hr(),
              p(),
-             actionButton(inputId = "next_pred", label = "Next"),
-             textOutput("prediction_error")
+             span(textOutput("prediction_error"), style="color:#9D2235"),
+             actionButton(inputId = "next_pred", label = "Next", width = "35%")
            )
          )),
-# tabPanel(
-#     "Predictions",
-#     sidebarLayout(
-#       sidebarPanel(
-#         p("Enter your first and last name below,
-#           and then enter your predictions at right."),
-#         textInput("student_name", "Enter your name:", placeholder = "First Last"),
-#         hr(),
-#         p(),
-#         p("After you have entered your predictions, press
-#           the 'Next' button."),
-#         actionButton(inputId = "next_pred", label = "Next")
-#       ),
-#     mainPanel(
-#       p(),
-#       p("What do you predict for the state level? 
-#         Will most species have small, moderate, or large range sizes?"),
-#       textAreaInput("predict_state", "Enter your prediction in this space:", rows = 5, placeholder = "State prediction…"),
-#       p(),
-#       hr(),
-#       p("What do you predict for North America? 
-#         Will most species have small, moderate, or large range sizes?"),
-#       textAreaInput("predict_na", "Enter your prediction in this space:", rows = 5, placeholder = "North America prediction…"),
-#       p(),
-#       hr(),
-#       p("What do you predict for the California marine fishes? 
-#         Will most species have small, moderate, or large range sizes?"),
-#       textAreaInput("predict_state", "Enter your prediction in this space:", rows = 5, placeholder = "California prediction…"),
-#       p()
-#     )
-#   )),
 
 # State tab ---------------------------------------------------------------
 
@@ -228,8 +198,8 @@ tabPanel("Predictions",
              mainPanel(
                plotOutput("ca_marine_plot")
              )
-           )) # End chi tabPanel
-) # end UI
+           )) # End CA Marine tabPanel
+)) # end UI
 
 # Server ------------------------------------------------------------------
 
@@ -283,16 +253,21 @@ server <- function(input, output, session) {
     # appendTab(inputId = "tabs", state_tab)
     #  appendTab(inputId = "tabs", na_tab)
   })
-  
-  output$downloadReport <- downloadHandler({
-    #req(input$student_name, input$predict_state, input$predict_na, input$predict_ca)
-#    req(input$predict_na)
-#    req(input$predict_ca)
-#    filename = function() {
+
+
+  # Report output idea from Shiny Gallery
+  output$downloadReport <- downloadHandler(
+    filename = function() {
       paste('my-report', sep = '.', 'pdf')
     },
     
     content = function(file) {
+      notification_id <- showNotification(
+        "Generating report for download.",
+        duration = NULL,
+        closeButton = FALSE,
+        type = "message"
+      )
       src <- normalizePath('range_report.Rmd')
       
       # temporarily switch to the temp dir, in case you do not have write
@@ -300,13 +275,20 @@ server <- function(input, output, session) {
       owd <- setwd(tempdir())
       on.exit(setwd(owd))
       file.copy(src, 'range_report.Rmd', overwrite = TRUE)
-      
+
+            
       library(rmarkdown)
       out <- render('range_report.Rmd', 
-                    pdf_document())
+                    pdf_document(latex_engine = "lualatex"))
       file.rename(out, file)
+      on.exit(removeNotification(notification_id), add = TRUE)
+      
     }
   )
+  
+  
+  
+  
   
 ## Outputs -------------------------------------------------------------
 
