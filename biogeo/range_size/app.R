@@ -41,22 +41,7 @@ state_tab <- tabPanel("test_tab",
                       h4("this is tab2"))
 
 # Global functions --------------------------------------------------------
-
-# Open the data set.
-
-open_state_file <- function(st, tx) {
-  # State and taxon
-  the_state <- str_replace_all(st, " ", "_") # For two word states
-  file_to_open <- paste0("state_data/", the_state, "_", tx, ".csv")
-  read.csv(file_to_open, row.names = 1)
-}
-
-open_na_file <- function(natx) {
-  # North American taxon
-  file_to_open <- paste0("na_data/na_", natx, ".csv")
-  read.csv(file_to_open, row.names = 1)
-}
-
+# Moved to files in the R folder.
 
 ## UI ----------------------------------------------------------------------
 
@@ -224,11 +209,12 @@ server <- function(input, output, session) {
   })
 
   spp <- reactive({
-    open_state_file(input$state, input$taxon)
+    #open_state_file(input$state, input$taxon)
+    open_file(tx = input$taxon, st = input$state)
   })
   
   spp_na <- reactive({
-    open_na_file(input$na_taxon)
+    open_file(tx = input$na_taxon)
   })
   
   plots <- reactiveValues(state = NULL, na = NULL, ca = NULL)
