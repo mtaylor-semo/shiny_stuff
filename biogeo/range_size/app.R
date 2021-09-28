@@ -69,6 +69,7 @@ ui <- tagList(
 # Predictions tab ---------------------------------------------------------
 tabPanel("Predictions",
          fluidRow(
+           column(1),
            column(
              2,
              textInput("student_name", 
@@ -140,12 +141,11 @@ tabPanel("State",
                width = "80%"
              ),
              uiOutput("dynamic_radio_buttons"),
-             uiOutput("state_numbers"),
              hr(),
              downloadButton('downloadReport')
            )),
            column(5, plotOutput("state_histogram")),
-           column(2, p("Binwidth column"))
+           column(2, uiOutput("state_numbers"))
          )),
 
 # Old State tab ---------------------------------------------------------------
@@ -184,11 +184,10 @@ tabPanel("North America",
       radioButtons("na_taxon", 
                    label = "Choose taxon:",
                    choices = c("Fishes", "Mussels"),
-                   selected = "Fishes"),
-      uiOutput("na_numbers")
+                   selected = "Fishes")
       )),
     column(5, plotOutput("na_histogram")),
-    column(2, p("text"))
+    column(2, uiOutput("na_numbers"))
     )
   ),
 
@@ -223,11 +222,12 @@ tabPanel("California Marine Fishes",
            wellPanel(radioButtons(inputId = "ca_marine",
                         label = "Choose plot type",
                         choices = c("Range size", "Range extent")
-           ),
-           p("This data set has 516 species."),
+           )
            )),
     column(5, plotOutput("ca_marine_plot")),
-    column(4, img(src = "california.png", width = "320px"))
+    column(4,
+           p("This data set has 516 species."),
+           img(src = "california.png", width = "320px"))
   )
 ),
 
