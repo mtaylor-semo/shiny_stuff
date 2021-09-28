@@ -121,68 +121,133 @@ tabPanel("Predictions",
            )
          )),
 
-# State tab ---------------------------------------------------------------
 
-  tabPanel("State",
-           sidebarLayout(
-             sidebarPanel(
-               p("Choose your state and then taxon 
-                 to see the histogram."
-               ),
-               selectInput(inputId = "state",
-                           label = "Choose a state", 
-                           choices = unique(states),
-                           selected = "Georgia",
-                           multiple = FALSE),
-               uiOutput("dynamic_radio_buttons"),
-               uiOutput("state_numbers"),
-               hr(),
-               downloadButton('downloadReport')
+# State tab -----------------------------------------------------------
+
+tabPanel("State",
+         fluidRow(
+           column(1),
+           column(
+             2,
+             p("Choose your state and then taxon
+                 to see the histogram."),
+             selectInput(
+               inputId = "state",
+               label = "Choose a state",
+               choices = unique(states),
+               selected = "Georgia",
+               multiple = FALSE,
+               width = "80%"
              ),
-             
-             mainPanel(
-               plotOutput("state_histogram")
-             )
-           )),
-  
+             uiOutput("dynamic_radio_buttons"),
+             uiOutput("state_numbers"),
+             hr(),
+             downloadButton('downloadReport')
+           ),
+           column(5, plotOutput("state_histogram")),
+           column(2, p("Binwidth column"))
+         )),
+
+# Old State tab ---------------------------------------------------------------
+
+  # tabPanel("State",
+  #          sidebarLayout(
+  #            sidebarPanel(
+  #              p("Choose your state and then taxon 
+  #                to see the histogram."
+  #              ),
+  #              selectInput(inputId = "state",
+  #                          label = "Choose a state", 
+  #                          choices = unique(states),
+  #                          selected = "Georgia",
+  #                          multiple = FALSE),
+  #              uiOutput("dynamic_radio_buttons"),
+  #              uiOutput("state_numbers"),
+  #              hr(),
+  #              downloadButton('downloadReport')
+  #            ),
+  #            
+  #            mainPanel(
+  #              plotOutput("state_histogram")
+  #            )
+  #          )),
+  # 
+# North America NEW -------------------------------------------------------
+
+tabPanel("North America",
+  fluidRow(
+    column(1),
+    column(
+      2, 
+      p("Range size for North America."
+      ),
+      radioButtons("na_taxon", 
+                   label = "Choose taxon:",
+                   choices = c("Fishes", "Mussels"),
+                   selected = "Fishes"),
+      uiOutput("na_numbers")
+      ),
+    column(5, plotOutput("na_histogram")),
+    column(2, p("text"))
+    )
+  ),
+
 # North America tab -------------------------------------------------------
   
-  tabPanel("North America",
-           sidebarLayout(
-             sidebarPanel(
-               p("Range size for North America."
-               ),
-               radioButtons("na_taxon", 
-                            label = "Choose taxon:",
-                            choices = c("Fishes", "Mussels"),
-                            selected = "Fishes"),
-               uiOutput("na_numbers")
-               ),
-             
-             
-             mainPanel(
-               plotOutput("na_histogram")
-             )
-           )),
+  # tabPanel("North America OLD",
+  #          sidebarLayout(
+  #            sidebarPanel(
+  #              p("Range size for North America."
+  #              ),
+  #              radioButtons("na_taxon", 
+  #                           label = "Choose taxon:",
+  #                           choices = c("Fishes", "Mussels"),
+  #                           selected = "Fishes"),
+  #              uiOutput("na_numbers")
+  #              ),
+  #            
+  #            
+  #            mainPanel(
+  #              plotOutput("na_histogram")
+  #            )
+  #          )),
   
+
 
 # California Marine Fishes ------------------------------------------------
 
-  tabPanel("California Marine Fishes",
-           sidebarLayout(
-             sidebarPanel(
-               radioButtons(inputId = "ca_marine",
-                            label = "Choose plot type",
-                            choices = c("Range size", "Range extent")
-                            ),
-               p("This data set has 516 species."),
-               hr(),
-               img(src = "california.png", width = "320px")
-             ),
-             mainPanel(
-               plotOutput("ca_marine_plot")
-             )
-           )) # End CA Marine tabPanel
+tabPanel("California Marine Fishes",
+  fluidRow(
+    column(1),
+    column(2,
+           radioButtons(inputId = "ca_marine",
+                        label = "Choose plot type",
+                        choices = c("Range size", "Range extent")
+           ),
+           p("This data set has 516 species."),
+           ),
+    column(5, plotOutput("ca_marine_plot")),
+    column(4, img(src = "california.png", width = "320px"))
+  )
+),
+
+# California Marine Fishes ------------------------------------------------
+
+  # tabPanel("California Marine Fishes",
+  #          sidebarLayout(
+  #            sidebarPanel(
+  #              radioButtons(inputId = "ca_marine",
+  #                           label = "Choose plot type",
+  #                           choices = c("Range size", "Range extent")
+  #                           ),
+  #              p("This data set has 516 species."),
+  #              hr(),
+  #              img(src = "california.png", width = "320px")
+  #            ),
+  #            mainPanel(
+  #              plotOutput("ca_marine_plot")
+  #            )
+  #          )) # End CA Marine tabPanel
 )) # end UI
 
 # Server ------------------------------------------------------------------
@@ -223,10 +288,10 @@ server <- function(input, output, session) {
 
   observeEvent(input$next_pred, {
     # Comment out for development.
-    pred_check(sn = input$student_name,
-               ps = input$predict_state,
-               pn = input$predict_na,
-               pc = input$predict_ca)
+    # pred_check(sn = input$student_name,
+    #            ps = input$predict_state,
+    #            pn = input$predict_na,
+    #            pc = input$predict_ca)
 
     hideTab(inputId = "tabs", target = "Predictions")
     showTab(inputId = "tabs", target = "State")
