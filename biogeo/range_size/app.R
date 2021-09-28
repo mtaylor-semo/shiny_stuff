@@ -352,8 +352,8 @@ server <- function(input, output, session) {
 ## California Marine plots -------------------------------------------------
 
   output$ca_marine_plot <- renderPlot({
-    cafish <- read.csv('marine/california_marine_fishes.csv', header=TRUE, row.names=1)
-    
+    cafish <- open_file(st = "California")
+
     if (input$ca_marine == "Range size") {
       rangeSize <- rowSums(cafish)
       numSpecies <- colSums(cafish)

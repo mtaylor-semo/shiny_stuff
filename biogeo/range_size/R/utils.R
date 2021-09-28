@@ -8,8 +8,15 @@ open_file <- function(tx, st = NULL) {
   if (is.null(st)) {
     file_to_open <- paste0("na_data/na_", tx, ".csv")
   } else {
-    the_state <- str_replace_all(st, " ", "_") 
-    file_to_open <- paste0("state_data/", the_state, "_", tx, ".csv")
+    switch(st,
+           "California" = {
+             file_to_open <- "marine/california_marine_fishes.csv"
+           },
+           {
+             the_state <- str_replace_all(st, " ", "_") 
+             file_to_open <- paste0("state_data/", the_state, "_", tx, ".csv")
+           }
+           )
   }
   read.csv(file_to_open, row.names = 1)
 }
