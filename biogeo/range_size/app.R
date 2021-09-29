@@ -39,8 +39,6 @@ state_taxa <- tibble(states, taxa)
 #                       br(),
 #                       h4("this is tab2"))
 
-# Global functions --------------------------------------------------------
-# Moved to files in the R folder.
 
 ## UI ----------------------------------------------------------------------
 
@@ -188,9 +186,7 @@ tabPanel("California Marine Fishes",
            p("This data set has 516 species."),
            img(src = "california.png", width = "320px"))
   )
-),
-
-
+)
 )) # end UI
 
 # Server ------------------------------------------------------------------
