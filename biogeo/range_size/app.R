@@ -318,23 +318,9 @@ server <- function(input, output, session) {
     
     nws <- nrow(spp())
     
-    #dat <- tibble(numWatersheds) # Need tibble for ggplot.
-    
     bins <- input$bins
     
     plots$state <- plotHistogram(dat = tibble(numWatersheds), x = numWatersheds, breaks = c(nws, input$bins))
-    
-    # plots$state <- ggplot(tibble(numWatersheds), aes(x = numWatersheds)) +
-    #   geom_histogram(
-    #     binwidth = bins,
-    #     closed = "right",
-    #     breaks = seq(0, nws, bins),
-    #     color = "white"
-    #   ) +
-    #   xlab("Number of Watersheds") +
-    #   ylab("Number of Species") +
-    #   xlim(0, nws) +
-    #   theme_minimal()
     
     plots$state
   })
@@ -352,19 +338,6 @@ server <- function(input, output, session) {
 
     plots$na <- plotHistogram(dat = tibble(numWatersheds), x = numWatersheds, breaks = c(nws, input$na_bins))
     
-#     plots$na <- ggplot(dat, aes(x = numWatersheds)) +
-#       geom_histogram(
-# #        binwidth = 5,
-#         closed = "right",
-#         breaks = seq(0, nws, input$na_bins),
-#         color = "white",
-#         fill = "#9d2235"
-#       ) +
-#       xlab("Number of Watersheds") +
-#       ylab("Number of Species") +
-#       xlim(0, nws) +
-#       theme_minimal()
-    
     plots$na
   })
   
@@ -378,33 +351,12 @@ server <- function(input, output, session) {
       rangeSize <- rowSums(cafish)
       numSpecies <- colSums(cafish)
       
-      #highSp <- ceiling(max(numSpecies)/10)*10
-      
-      #max(rangeSize)	# maximum number of degrees latitude occupied
-      #min(rangeSize)	# minimum number of degrees latitude occupied
-      #mean(rangeSize)	# mean number of degrees latitude occupied
-      
-      #dat <- tibble(rangeSize) 
-      
-      plots$ca <- plotHistogram(dat = tibble(rangeSize), x = rangeSize, breaks = c(100, 5))
-      plots$ca + 
+      plots$ca <- plotHistogram(dat = tibble(rangeSize), x = rangeSize, breaks = c(100, 5))  + 
         scale_x_continuous(breaks = seq(0,100,20)) +
         xlab("Range size (degrees of latitude occupied)")
-        
-      
-      # plots$ca <- ggplot(dat, aes(x = rangeSize)) +
-      #   geom_histogram(
-      #     closed = "right",
-      #     breaks = seq(0,100,5),
-      #     color = "white"
-      #   ) +
-      #   scale_x_continuous(breaks = seq(0,100,20)) +
-      #   xlab("Latitude (°N)") +
-      #   ylab("Number of Species") +
-      #   theme_minimal()
-      
-      #plots$ca
-      
+    
+      plots$ca
+
     } else { # plot 2.  Need better checks for the if/else
       
       mycolors <- c("#9d2235", "#003b5c")
@@ -433,6 +385,8 @@ server <- function(input, output, session) {
       cafish$minLat <- minLat
       cafish$maxLat <- maxLat
       cafish$meanLat <- meanLat
+
+      print(head(cafish))
       
       latCol <- vector('character')
       for (i in 1:numRows) {
@@ -443,7 +397,6 @@ server <- function(input, output, session) {
       cafish$latCol <- latCol
       
       cafish <- cafish[order(-cafish$minLat,-cafish$meanLat),]
-      
       
       plot(nrow(cafish),99, type='n', xlim=c(1,516), ylim=c(-30,68), ylab='Latitude (°S — °N)', xlab='Species Index', main='Latitudinal Range for\nCalifornia Coastal Marine Fishes')
       for (i in 1:numRows){
