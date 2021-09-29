@@ -36,5 +36,5 @@ plots$na
 Histogram of California Marine Fishes for geographic range size.
 
 ```{r fig.dim=c(3,2), echo=FALSE}
-plots$na
+plots$ca
 ```
