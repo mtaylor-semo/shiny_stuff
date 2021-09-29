@@ -31,13 +31,13 @@ taxa <-
 
 state_taxa <- tibble(states, taxa)
 
-# Predefined tabs. See https://stackoverflow.com/a/60229331/3832941
-# I predefined the tabPanels here so that I didn't clutter the
-# server code.
-state_tab <- tabPanel("test_tab", 
-                      value = "tab2_val", 
-                      br(),
-                      h4("this is tab2"))
+# # Predefined tabs. See https://stackoverflow.com/a/60229331/3832941
+# # I predefined the tabPanels here so that I didn't clutter the
+# # server code.
+# state_tab <- tabPanel("test_tab", 
+#                       value = "tab2_val", 
+#                       br(),
+#                       h4("this is tab2"))
 
 # Global functions --------------------------------------------------------
 # Moved to files in the R folder.
@@ -65,6 +65,7 @@ ui <- tagList(
         explore latitudal gradient, compare taxa within state, etc...")
     )
   ),
+
 
 # Predictions tab ---------------------------------------------------------
 tabPanel("Predictions",
@@ -123,6 +124,7 @@ tabPanel("Predictions",
          )),
 
 
+
 # State tab -----------------------------------------------------------
 
 tabPanel("State",
@@ -148,30 +150,7 @@ tabPanel("State",
            column(2, uiOutput("state_numbers"))
          )),
 
-# Old State tab ---------------------------------------------------------------
 
-  # tabPanel("State",
-  #          sidebarLayout(
-  #            sidebarPanel(
-  #              p("Choose your state and then taxon 
-  #                to see the histogram."
-  #              ),
-  #              selectInput(inputId = "state",
-  #                          label = "Choose a state", 
-  #                          choices = unique(states),
-  #                          selected = "Georgia",
-  #                          multiple = FALSE),
-  #              uiOutput("dynamic_radio_buttons"),
-  #              uiOutput("state_numbers"),
-  #              hr(),
-  #              downloadButton('downloadReport')
-  #            ),
-  #            
-  #            mainPanel(
-  #              plotOutput("state_histogram")
-  #            )
-  #          )),
-  # 
 # North America tab -------------------------------------------------------
 
 tabPanel("North America",
@@ -191,26 +170,6 @@ tabPanel("North America",
     )
   ),
 
-# North America OLD -------------------------------------------------------
-  
-  # tabPanel("North America OLD",
-  #          sidebarLayout(
-  #            sidebarPanel(
-  #              p("Range size for North America."
-  #              ),
-  #              radioButtons("na_taxon", 
-  #                           label = "Choose taxon:",
-  #                           choices = c("Fishes", "Mussels"),
-  #                           selected = "Fishes"),
-  #              uiOutput("na_numbers")
-  #              ),
-  #            
-  #            
-  #            mainPanel(
-  #              plotOutput("na_histogram")
-  #            )
-  #          )),
-  
 
 
 # California Marine Fishes ------------------------------------------------
@@ -231,23 +190,7 @@ tabPanel("California Marine Fishes",
   )
 ),
 
-# California Marine Fishes ------------------------------------------------
 
-  # tabPanel("California Marine Fishes",
-  #          sidebarLayout(
-  #            sidebarPanel(
-  #              radioButtons(inputId = "ca_marine",
-  #                           label = "Choose plot type",
-  #                           choices = c("Range size", "Range extent")
-  #                           ),
-  #              p("This data set has 516 species."),
-  #              hr(),
-  #              img(src = "california.png", width = "320px")
-  #            ),
-  #            mainPanel(
-  #              plotOutput("ca_marine_plot")
-  #            )
-  #          )) # End CA Marine tabPanel
 )) # end UI
 
 # Server ------------------------------------------------------------------
