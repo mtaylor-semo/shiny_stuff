@@ -137,15 +137,17 @@ tabPanel("State",
                label = "Choose a state",
                choices = unique(states),
                selected = "Georgia",
-               multiple = FALSE,
-               width = "80%"
+               multiple = FALSE
              ),
              uiOutput("dynamic_radio_buttons"),
              hr(),
              downloadButton('downloadReport')
            )),
            column(5, plotOutput("state_histogram")),
-           column(2, uiOutput("state_numbers"))
+           column(2, 
+                  uiOutput("state_numbers"),
+                  hr(),
+                  numericInput("bins", "Change the number of bins", min = 1, max = 5, value = 1, step = 1))
          )),
 
 
@@ -164,10 +166,18 @@ tabPanel("North America",
                    selected = "Fishes")
       )),
     column(5, plotOutput("na_histogram")),
-    column(2, uiOutput("na_numbers"))
+    column(2, 
+           uiOutput("na_numbers"),
+           hr(),
+           numericInput("na_bins", 
+                        "Change the number of bins", 
+                        min = 1, 
+                        max = 10, 
+                        value = 5, 
+                        step = 1)
+  )
     )
   ),
-
 
 
 # California Marine Fishes ------------------------------------------------
@@ -189,6 +199,7 @@ tabPanel("California Marine Fishes",
 )
 )) # end UI
 
+
 # Server ------------------------------------------------------------------
 
 server <- function(input, output, session) {
@@ -204,6 +215,7 @@ server <- function(input, output, session) {
   hideTab("tabs", "State")
   hideTab("tabs", "North America")
   hideTab("tabs", "California Marine Fishes")
+  
 ## Reactive values ---------------------------------------------------------
   
   state <- reactive({
@@ -275,10 +287,7 @@ server <- function(input, output, session) {
       
     }
   )
-  
-  
-  
-  
+
   
 ## Outputs -------------------------------------------------------------
 
@@ -311,11 +320,13 @@ server <- function(input, output, session) {
     
     #dat <- tibble(numWatersheds) # Need tibble for ggplot.
     
+    bins <- input$bins
+    
     plots$state <- ggplot(tibble(numWatersheds), aes(x = numWatersheds)) +
       geom_histogram(
-        binwidth = 1,
+        binwidth = bins,
         closed = "right",
-        breaks = seq(0, nws, 1),
+        breaks = seq(0, nws, bins),
         color = "white"
       ) +
       xlab("Number of Watersheds") +
@@ -339,9 +350,9 @@ server <- function(input, output, session) {
 
     plots$na <- ggplot(dat, aes(x = numWatersheds)) +
       geom_histogram(
-        binwidth = 5,
+#        binwidth = 5,
         closed = "right",
-        breaks = seq(0, nws, 5),
+        breaks = seq(0, nws, input$na_bins),
         color = "white"
       ) +
       xlab("Number of Watersheds") +
@@ -435,5 +446,8 @@ server <- function(input, output, session) {
 
 }
 
+
 # Run the application
 shinyApp(ui = ui, server = server)
+
+
