@@ -322,17 +322,19 @@ server <- function(input, output, session) {
     
     bins <- input$bins
     
-    plots$state <- ggplot(tibble(numWatersheds), aes(x = numWatersheds)) +
-      geom_histogram(
-        binwidth = bins,
-        closed = "right",
-        breaks = seq(0, nws, bins),
-        color = "white"
-      ) +
-      xlab("Number of Watersheds") +
-      ylab("Number of Species") +
-      xlim(0, nws) +
-      theme_minimal()
+    plots$state <- plotHistogram(dat = tibble(numWatersheds), x = numWatersheds, breaks = c(nws, input$bins))
+    
+    # plots$state <- ggplot(tibble(numWatersheds), aes(x = numWatersheds)) +
+    #   geom_histogram(
+    #     binwidth = bins,
+    #     closed = "right",
+    #     breaks = seq(0, nws, bins),
+    #     color = "white"
+    #   ) +
+    #   xlab("Number of Watersheds") +
+    #   ylab("Number of Species") +
+    #   xlim(0, nws) +
+    #   theme_minimal()
     
     plots$state
   })
@@ -348,17 +350,20 @@ server <- function(input, output, session) {
     
     nws <- nrow(spp_na()) # Number of watersheds for x-axis
 
-    plots$na <- ggplot(dat, aes(x = numWatersheds)) +
-      geom_histogram(
-#        binwidth = 5,
-        closed = "right",
-        breaks = seq(0, nws, input$na_bins),
-        color = "white"
-      ) +
-      xlab("Number of Watersheds") +
-      ylab("Number of Species") +
-      xlim(0, nws) +
-      theme_minimal()
+    plots$na <- plotHistogram(dat = tibble(numWatersheds), x = numWatersheds, breaks = c(nws, input$na_bins))
+    
+#     plots$na <- ggplot(dat, aes(x = numWatersheds)) +
+#       geom_histogram(
+# #        binwidth = 5,
+#         closed = "right",
+#         breaks = seq(0, nws, input$na_bins),
+#         color = "white",
+#         fill = "#9d2235"
+#       ) +
+#       xlab("Number of Watersheds") +
+#       ylab("Number of Species") +
+#       xlim(0, nws) +
+#       theme_minimal()
     
     plots$na
   })
@@ -373,25 +378,32 @@ server <- function(input, output, session) {
       rangeSize <- rowSums(cafish)
       numSpecies <- colSums(cafish)
       
-      highSp <- ceiling(max(numSpecies)/10)*10
+      #highSp <- ceiling(max(numSpecies)/10)*10
       
-      max(rangeSize)	# maximum number of degrees latitude occupied
-      min(rangeSize)	# minimum number of degrees latitude occupied
-      mean(rangeSize)	# mean number of degrees latitude occupied
+      #max(rangeSize)	# maximum number of degrees latitude occupied
+      #min(rangeSize)	# minimum number of degrees latitude occupied
+      #mean(rangeSize)	# mean number of degrees latitude occupied
       
-      dat <- tibble(rangeSize) 
-      plots$ca <- ggplot(dat, aes(x = rangeSize)) +
-        geom_histogram(
-          closed = "right",
-          breaks = seq(0,100,5),
-          color = "white"
-        ) +
+      #dat <- tibble(rangeSize) 
+      
+      plots$ca <- plotHistogram(dat = tibble(rangeSize), x = rangeSize, breaks = c(100, 5))
+      plots$ca + 
         scale_x_continuous(breaks = seq(0,100,20)) +
-        xlab("Latitude (°N)") +
-        ylab("Number of Species") +
-        theme_minimal()
+        xlab("Range size (degrees of latitude occupied)")
+        
       
-      plots$ca
+      # plots$ca <- ggplot(dat, aes(x = rangeSize)) +
+      #   geom_histogram(
+      #     closed = "right",
+      #     breaks = seq(0,100,5),
+      #     color = "white"
+      #   ) +
+      #   scale_x_continuous(breaks = seq(0,100,20)) +
+      #   xlab("Latitude (°N)") +
+      #   ylab("Number of Species") +
+      #   theme_minimal()
+      
+      #plots$ca
       
     } else { # plot 2.  Need better checks for the if/else
       
