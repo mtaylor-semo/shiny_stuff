@@ -41,6 +41,8 @@ pred_check <- function(sn = NULL, ps = NULL, pn = NULL, pc = NULL) {
   req(sn, ps, pn, pc)
 }
 
+
+
 plotHistogram <- function(dat = NULL, x = NULL, closed = "right", breaks = c(y,z), ...) {
  ggplot(data = dat, aes(x = x)) +
     geom_histogram(
