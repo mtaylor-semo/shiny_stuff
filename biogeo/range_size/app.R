@@ -137,15 +137,17 @@ tabPanel("State",
                label = "Choose a state",
                choices = unique(states),
                selected = "Georgia",
-               multiple = FALSE,
-               width = "80%"
+               multiple = FALSE
              ),
              uiOutput("dynamic_radio_buttons"),
              hr(),
              downloadButton('downloadReport')
            )),
            column(5, plotOutput("state_histogram")),
-           column(2, uiOutput("state_numbers"))
+           column(2, 
+                  uiOutput("state_numbers"),
+                  hr(),
+                  numericInput("bins", "Change the number of bins", min = 1, max = 5, value = 1, step = 1))
          )),
 
 
@@ -164,10 +166,18 @@ tabPanel("North America",
                    selected = "Fishes")
       )),
     column(5, plotOutput("na_histogram")),
-    column(2, uiOutput("na_numbers"))
+    column(2, 
+           uiOutput("na_numbers"),
+           hr(),
+           numericInput("na_bins", 
+                        "Change the number of bins", 
+                        min = 1, 
+                        max = 10, 
+                        value = 5, 
+                        step = 1)
+  )
     )
   ),
-
 
 
 # California Marine Fishes ------------------------------------------------
@@ -189,6 +199,7 @@ tabPanel("California Marine Fishes",
 )
 )) # end UI
 
+
 # Server ------------------------------------------------------------------
 
 server <- function(input, output, session) {
@@ -204,6 +215,7 @@ server <- function(input, output, session) {
   hideTab("tabs", "State")
   hideTab("tabs", "North America")
   hideTab("tabs", "California Marine Fishes")
+  
 ## Reactive values ---------------------------------------------------------
   
   state <- reactive({
@@ -275,10 +287,7 @@ server <- function(input, output, session) {
       
     }
   )
-  
-  
-  
-  
+
   
 ## Outputs -------------------------------------------------------------
 
@@ -309,19 +318,9 @@ server <- function(input, output, session) {
     
     nws <- nrow(spp())
     
-    #dat <- tibble(numWatersheds) # Need tibble for ggplot.
+    bins <- input$bins
     
-    plots$state <- ggplot(tibble(numWatersheds), aes(x = numWatersheds)) +
-      geom_histogram(
-        binwidth = 1,
-        closed = "right",
-        breaks = seq(0, nws, 1),
-        color = "white"
-      ) +
-      xlab("Number of Watersheds") +
-      ylab("Number of Species") +
-      xlim(0, nws) +
-      theme_minimal()
+    plots$state <- plotHistogram(dat = tibble(numWatersheds), x = numWatersheds, breaks = c(nws, input$bins))
     
     plots$state
   })
@@ -337,17 +336,7 @@ server <- function(input, output, session) {
     
     nws <- nrow(spp_na()) # Number of watersheds for x-axis
 
-    plots$na <- ggplot(dat, aes(x = numWatersheds)) +
-      geom_histogram(
-        binwidth = 5,
-        closed = "right",
-        breaks = seq(0, nws, 5),
-        color = "white"
-      ) +
-      xlab("Number of Watersheds") +
-      ylab("Number of Species") +
-      xlim(0, nws) +
-      theme_minimal()
+    plots$na <- plotHistogram(dat = tibble(numWatersheds), x = numWatersheds, breaks = c(nws, input$na_bins))
     
     plots$na
   })
@@ -362,29 +351,16 @@ server <- function(input, output, session) {
       rangeSize <- rowSums(cafish)
       numSpecies <- colSums(cafish)
       
-      highSp <- ceiling(max(numSpecies)/10)*10
-      
-      max(rangeSize)	# maximum number of degrees latitude occupied
-      min(rangeSize)	# minimum number of degrees latitude occupied
-      mean(rangeSize)	# mean number of degrees latitude occupied
-      
-      dat <- tibble(rangeSize) 
-      plots$ca <- ggplot(dat, aes(x = rangeSize)) +
-        geom_histogram(
-          closed = "right",
-          breaks = seq(0,100,5),
-          color = "white"
-        ) +
+      plots$ca <- plotHistogram(dat = tibble(rangeSize), x = rangeSize, breaks = c(100, 5))  + 
         scale_x_continuous(breaks = seq(0,100,20)) +
-        xlab("Latitude (°N)") +
-        ylab("Number of Species") +
-        theme_minimal()
-      
+        xlab("Range size (degrees of latitude occupied)")
+    
       plots$ca
-      
+
     } else { # plot 2.  Need better checks for the if/else
       
-      mycolors <- c("#E69F00", "#56B4E9")
+      ## Convert much of this manipulation to dplyr / tidyverse
+      mycolors <- c("#9d2235", "#003b5c")
       numRows <- nrow(cafish) ## number of species
       numCols <- ncol(cafish) ## Number of 1° latitude cells
       
@@ -410,6 +386,8 @@ server <- function(input, output, session) {
       cafish$minLat <- minLat
       cafish$maxLat <- maxLat
       cafish$meanLat <- meanLat
+
+      print(head(cafish))
       
       latCol <- vector('character')
       for (i in 1:numRows) {
@@ -418,22 +396,36 @@ server <- function(input, output, session) {
       } 
       
       cafish$latCol <- latCol
+      cafish$xrow <- seq(1:516)
       
       cafish <- cafish[order(-cafish$minLat,-cafish$meanLat),]
       
+      ggplot(cafish) +
+        geom_segment(aes(x = xrow, y = minLat, xend = xrow, yend = maxLat),
+                     color = latCol, size = 1.2) +
+        theme_minimal() +
+        ylab("Latitude (°S — °N)") +
+        xlab(NULL) +
+        geom_hline(yintercept = c(36, 32), col='gray') +
+        geom_hline(yintercept = meanCut, col = "gray10") +
+        scale_y_continuous(breaks = seq(-40, 70, 10)) +
+        theme(axis.text.x = element_blank())
       
-      plot(nrow(cafish),99, type='n', xlim=c(1,516), ylim=c(-30,68), ylab='Latitude (°S — °N)', xlab='Species Index', main='Latitudinal Range for\nCalifornia Coastal Marine Fishes')
-      for (i in 1:numRows){
-        segments(x0 = i, y0 = cafish$minLat[i], x1 = i, y1 <- cafish$maxLat[i], col=cafish$latCol[i])
-        
-      }
-      abline(h=36,col='gray')
-      abline(h=meanCut,col='gray3')
-      abline(h=32,col='gray')
+      # plot(nrow(cafish),99, type='n', xlim=c(1,516), ylim=c(-30,68), ylab='Latitude (°S — °N)', xlab='Species Index', main='Latitudinal Range for\nCalifornia Coastal Marine Fishes')
+      # for (i in 1:numRows){
+      #   segments(x0 = i, y0 = cafish$minLat[i], x1 = i, y1 <- cafish$maxLat[i], col=cafish$latCol[i])
+      #   
+      # }
+      # abline(h=36,col='gray')
+      # abline(h=meanCut,col='gray3')
+      # abline(h=32,col='gray')
     }
   })
 
 }
 
+
 # Run the application
 shinyApp(ui = ui, server = server)
+
+

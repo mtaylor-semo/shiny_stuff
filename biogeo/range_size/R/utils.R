@@ -40,3 +40,20 @@ open_file <- function(tx, st = NULL) {
 pred_check <- function(sn = NULL, ps = NULL, pn = NULL, pc = NULL) {
   req(sn, ps, pn, pc)
 }
+
+
+
+plotHistogram <- function(dat = NULL, x = NULL, closed = "right", breaks = c(y,z), ...) {
+ ggplot(data = dat, aes(x = x)) +
+    geom_histogram(
+      #        binwidth = 5,
+      closed = closed,
+      breaks = seq(0, breaks[1], breaks[2]),
+      color = "white",
+      fill = "#9d2235"
+    ) +
+    xlab("Number of Watersheds") +
+    ylab("Number of Species") +
+    xlim(0, breaks[1]) +
+    theme_minimal()
+}
