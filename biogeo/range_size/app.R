@@ -216,7 +216,8 @@ ui <- tagList(
         column(
           4,
           p("This data set has 516 species."),
-          img(src = "california.png", width = "320px")
+          uiOutput("ca_info")
+          # img(src = "california.png", width = "320px")
         )
       )
     )
@@ -326,7 +327,7 @@ server <- function(input, output, session) {
       inputId = "taxon",
       "Choose a taxon",
       choices = choices
-    ) # c("Crayfishes", "Fishes", "Mussels"))
+    )
   })
 
   output$state_numbers <- renderUI({
@@ -338,6 +339,22 @@ server <- function(input, output, session) {
     dims <- dim(spp_na())
     sprintf("This data set has %d watersheds and %d species.", dims[1], dims[2])
   })
+
+  output$ca_info <- renderUI({
+    if (input$ca_marine == "Range extent") {
+      p("Range extent for California coastal marine fishes. Each
+        vertical bar shows the minimum to maximum latitude for
+        one species of fish. Species with a 
+        median latitude above Point Conception are shown in 
+        red. Species with an average latitude below Point Conception 
+        are shown in blue. The horizontal black line is the latitude of
+        Point Conception. Fishes are sorted (left to right on 
+        x-axis) in order of minimum latitude. ")
+    } else {
+      img(src = "california.png", width = "320px")
+    }
+  })
+
 
 
   ## State histograms ------------------------------------------------------
@@ -395,7 +412,7 @@ server <- function(input, output, session) {
 
       meanCut <- 34.4481 ## Point Conception latitude as cutoff for northern and southern species.
 
-      meanLat <- rep(NA, numRows) ## Create a vector same length as number of species.
+      medianLat <- rep(NA, numRows) ## Create a vector same length as number of species.
 
       minLat <- vector("numeric")
       maxLat <- vector("numeric")
@@ -409,18 +426,16 @@ server <- function(input, output, session) {
 
         minLat[i] <- as.numeric(colNames[1])
         maxLat[i] <- as.numeric(colNames[length(colNames)])
-        meanLat[i] <- mean(as.numeric(colNames))
+        medianLat[i] <- median(as.numeric(colNames))
       }
 
       cafish$minLat <- minLat
       cafish$maxLat <- maxLat
-      cafish$meanLat <- meanLat
-
-      print(head(cafish))
+      cafish$medianLat <- medianLat
 
       latCol <- vector("character")
       for (i in 1:numRows) {
-        if (cafish$meanLat[i] > meanCut) {
+        if (cafish$medianLat[i] > meanCut) {
           latCol[i] <- mycolors[1]
         } else {
           latCol[i] <- mycolors[2]
@@ -430,7 +445,7 @@ server <- function(input, output, session) {
       cafish$latCol <- latCol
       cafish$xrow <- seq(1:516)
 
-      cafish <- cafish[order(-cafish$minLat, -cafish$meanLat), ]
+      cafish <- cafish[order(-cafish$minLat, -cafish$medianLat), ]
 
       ggplot(cafish) +
         geom_segment(aes(x = xrow, y = minLat, xend = xrow, yend = maxLat),
@@ -444,14 +459,6 @@ server <- function(input, output, session) {
         scale_y_continuous(breaks = seq(-40, 70, 10)) +
         theme(axis.text.x = element_blank())
 
-      # plot(nrow(cafish),99, type='n', xlim=c(1,516), ylim=c(-30,68), ylab='Latitude (°S — °N)', xlab='Species Index', main='Latitudinal Range for\nCalifornia Coastal Marine Fishes')
-      # for (i in 1:numRows){
-      #   segments(x0 = i, y0 = cafish$minLat[i], x1 = i, y1 <- cafish$maxLat[i], col=cafish$latCol[i])
-      #
-      # }
-      # abline(h=36,col='gray')
-      # abline(h=meanCut,col='gray3')
-      # abline(h=32,col='gray')
     }
   })
 }
