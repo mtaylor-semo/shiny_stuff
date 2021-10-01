@@ -120,15 +120,6 @@ server <- function(input, output, session) {
     }
   })
 
-  #  hideTab("tabs", "State")
-  #  hideTab("tabs", "North America")
-
-  #  appendTab(inputId = "tabs", tab = states_tab)
-
-  #  appendTab(inputId = "tabs", tab = ca_tab)
-
-  # hideTab("tabs", "California Marine Fishes")
-
   ## Reactive values ---------------------------------------------------------
 
   state <- reactive({
@@ -139,7 +130,6 @@ server <- function(input, output, session) {
   })
 
   spp <- reactive({
-    # open_state_file(input$state, input$taxon)
     open_file(tx = input$taxon, st = input$state)
   })
 
