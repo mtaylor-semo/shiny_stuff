@@ -17,19 +17,19 @@ library(ggplot2)
 
 # file_list <- list.files("state_data/")
 # file_list_no_ext <- tools::file_path_sans_ext(file_list)
-# 
+#
 # states <- file_list_no_ext %>%
 #   word(start = 1, end = -2, sep = "_") %>%
 #   str_replace("_", " ") %>%
 #   str_to_title()
-# 
+#
 # taxa <-
 #   word(file_list_no_ext,
 #     start = -1,
 #     sep = "_"
 #   ) %>%
 #   str_to_title()
-# 
+#
 # state_taxa <- tibble(states, taxa)
 # state_choices <- unique(states)
 
@@ -74,9 +74,10 @@ ui <- tagList(
     tabPanel(
       "Predictions",
       fluidRow(
-        column(1),
+        # column(1),
         column(
-          2,
+          width = 2,
+          offset = 1,
           textInput("student_name",
             "Enter your name:",
             placeholder = "First Last"
@@ -87,7 +88,7 @@ ui <- tagList(
                'Next' button.")
         ),
         column(
-          4,
+          3,
           p("What do you predict for the state level? Will
                most species have small, moderate, or large range
                sizes?"),
@@ -110,7 +111,7 @@ ui <- tagList(
           )
         ),
         column(
-          4,
+          3,
           p("What do you predict for the California marine
                fishes? Will most species have small, moderate,
                or large range sizes?"),
@@ -123,8 +124,13 @@ ui <- tagList(
           p(),
           hr(),
           p(),
+          # span(textOutput("fprediction_error"), style = "color:#9D2235"),
+          # actionButton(inputId = "next_pred", label = "Next", width = "35%")
+        ),
+        column(
+          width = 2,
           span(textOutput("prediction_error"), style = "color:#9D2235"),
-          actionButton(inputId = "next_pred", label = "Next", width = "35%")
+          actionButton(inputId = "btn_next_pred", label = "Next", width = "35%")
         )
       )
     )
@@ -221,7 +227,7 @@ ui <- tagList(
     #       # img(src = "california.png", width = "320px")
     #     )
     #   )
-    #)
+    # )
   )
 ) # end UI
 
@@ -240,14 +246,14 @@ server <- function(input, output, session) {
     }
   })
 
-#  hideTab("tabs", "State")
-#  hideTab("tabs", "North America")
+  #  hideTab("tabs", "State")
+  #  hideTab("tabs", "North America")
 
-  appendTab(inputId = "tabs", tab = states_tab)
-  appendTab(inputId = "tabs", tab = na_tab)
-  appendTab(inputId = "tabs", tab = ca_tab)
-  
-  #hideTab("tabs", "California Marine Fishes")
+  #  appendTab(inputId = "tabs", tab = states_tab)
+
+  #  appendTab(inputId = "tabs", tab = ca_tab)
+
+  # hideTab("tabs", "California Marine Fishes")
 
   ## Reactive values ---------------------------------------------------------
 
@@ -272,18 +278,20 @@ server <- function(input, output, session) {
 
   # Button observers --------------------------------------------------------
 
-  observeEvent(input$next_pred, {
+  observeEvent(input$btn_next_pred, {
     # Comment out for development.
     # pred_check(sn = input$student_name,
     #            ps = input$predict_state,
     #            pn = input$predict_na,
     #            pc = input$predict_ca)
 
-    hideTab(inputId = "tabs", target = "Predictions")
-    showTab(inputId = "tabs", target = "State")
-    showTab(inputId = "tabs", target = "North America")
-    #showTab(inputId = "tabs", target = "California Marine Fishes")
-    updateTabsetPanel(inputId = "tabs", selected = "State")
+    # hideTab(inputId = "tabs", target = "Predictions")
+    removeTab(inputId = "tabs", target = "Predictions")
+    # updateTabsetPanel(inputId = "tabs", selected = "State")
+    appendTab(inputId = "tabs", tab = na_tab, select = TRUE)
+    # showTab(inputId = "tabs", target = "State")
+    # showTab(inputId = "tabs", target = "North America")
+    # showTab(inputId = "tabs", target = "California Marine Fishes")
     # See https://stackoverflow.com/a/60229331/3832941
     # for solution on appending tabs. I predefined tabs
     # up in global vars.
@@ -291,11 +299,22 @@ server <- function(input, output, session) {
     #  appendTab(inputId = "tabs", na_tab)
   })
 
+  observeEvent(input$btn_next_na, {
+    appendTab(inputId = "tabs", tab = states_tab, select = TRUE)
+  })
+
+  observeEvent(input$btn_next_state, {
+    appendTab(inputId = "tabs", tab = ca_tab, select = TRUE)
+  })
+
+
+
+  # Report Download ---------------------------------------------------------
 
   # Report output idea from Shiny Gallery
   output$downloadReport <- downloadHandler(
     filename = function() {
-      paste("my-report", sep = ".", "pdf")
+      paste("geographic_range", sep = ".", "pdf")
     },
     content = function(file) {
       notification_id <- showNotification(
@@ -324,6 +343,7 @@ server <- function(input, output, session) {
   )
 
 
+
   ## Outputs -------------------------------------------------------------
 
   output$dynamic_radio_buttons <- renderUI({
@@ -350,11 +370,11 @@ server <- function(input, output, session) {
     if (input$ca_marine == "Range extent") {
       p("Range extent for California coastal marine fishes. Each
         vertical bar shows the minimum to maximum latitude for
-        one species of fish. Species with a 
-        median latitude above Point Conception are shown in 
-        red. Species with an average latitude below Point Conception 
+        one species of fish. Species with a
+        median latitude above Point Conception are shown in
+        red. Species with an average latitude below Point Conception
         are shown in blue. The horizontal black line is the latitude of
-        Point Conception. Fishes are sorted (left to right on 
+        Point Conception. Fishes are sorted (left to right on
         x-axis) in order of minimum latitude. ")
     } else {
       img(src = "california.png", width = "320px")
@@ -373,7 +393,7 @@ server <- function(input, output, session) {
 
     bins <- input$bins
 
-    plots$state <- plotHistogram(dat = tibble(numWatersheds), x = numWatersheds, breaks = c(nws, input$bins))
+    plots$state <- plotHistogram(dat = tibble(numWatersheds), x = numWatersheds, breaks = c(nws, 1))
 
     plots$state
   })
@@ -383,13 +403,13 @@ server <- function(input, output, session) {
   output$na_histogram <- renderPlot({
     numWatersheds <- colSums(spp_na())
     numSpecies <- rowSums(spp_na())
-    bins <-
-      seq(min(numWatersheds), max(numWatersheds))
+    # bins <-
+    #   seq(min(numWatersheds), max(numWatersheds))
     dat <- tibble(numWatersheds)
 
     nws <- nrow(spp_na()) # Number of watersheds for x-axis
 
-    plots$na <- plotHistogram(dat = tibble(numWatersheds), x = numWatersheds, breaks = c(nws, input$na_bins))
+    plots$na <- plotHistogram(dat = tibble(numWatersheds), x = numWatersheds, breaks = c(nws, 5))
 
     plots$na
   })
@@ -464,7 +484,6 @@ server <- function(input, output, session) {
         geom_hline(yintercept = meanCut, col = "gray10") +
         scale_y_continuous(breaks = seq(-40, 70, 10)) +
         theme(axis.text.x = element_blank())
-
     }
   })
 }

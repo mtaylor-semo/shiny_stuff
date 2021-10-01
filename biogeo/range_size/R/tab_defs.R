@@ -8,17 +8,18 @@ states <- file_list_no_ext %>%
 
 taxa <-
   word(file_list_no_ext,
-       start = -1,
-       sep = "_"
+    start = -1,
+    sep = "_"
   ) %>%
   str_to_title()
 
 state_taxa <- tibble(states, taxa)
 state_choices <- unique(states)
 
-# Define tabs
 
-states_tab <-     tabPanel(
+# Define States tab -------------------------------------------------------
+
+states_tab <- tabPanel(
   "State",
   fluidRow(
     column(1),
@@ -36,7 +37,6 @@ states_tab <-     tabPanel(
         ),
         uiOutput("dynamic_radio_buttons"),
         hr(),
-        downloadButton("downloadReport")
       )
     ),
     column(5, plotOutput("state_histogram")),
@@ -44,14 +44,16 @@ states_tab <-     tabPanel(
       2,
       uiOutput("state_numbers"),
       hr(),
-      numericInput("bins", "Change the number of bins", min = 1, max = 5, value = 1, step = 1)
+      actionButton(inputId = "btn_next_state", label = "Next", width = "35%")
     )
   )
 )
 
-  
-  
-na_tab <-     tabPanel(
+
+
+# Define North America Tab ------------------------------------------------
+
+na_tab <- tabPanel(
   "North America",
   fluidRow(
     column(1),
@@ -60,9 +62,9 @@ na_tab <-     tabPanel(
       wellPanel(
         p("Range size for North America."),
         radioButtons("na_taxon",
-                     label = "Choose taxon:",
-                     choices = c("Fishes", "Mussels"),
-                     selected = "Fishes"
+          label = "Choose taxon:",
+          choices = c("Fishes", "Mussels"),
+          selected = "Fishes"
         )
       )
     ),
@@ -71,23 +73,21 @@ na_tab <-     tabPanel(
       2,
       uiOutput("na_numbers"),
       hr(),
-      numericInput("na_bins",
-                   "Change the number of bins",
-                   min = 1,
-                   max = 10,
-                   value = 5,
-                   step = 1
-      )
+      actionButton(inputId = "btn_next_na", label = "Next", width = "35%")
     )
   )
 )
 
+
+# Define California Marine Tab --------------------------------------------
+
+
 ca_tab <- tabPanel(
   "California Marine Fishes",
   fluidRow(
-    column(1),
     column(
       2,
+      offset = 1,
       wellPanel(radioButtons(
         inputId = "ca_marine",
         label = "Choose plot type",
@@ -98,7 +98,8 @@ ca_tab <- tabPanel(
     column(
       4,
       p("This data set has 516 species."),
-      uiOutput("ca_info")
+      uiOutput("ca_info"),
+      downloadButton("downloadReport")
       # img(src = "california.png", width = "320px")
     )
   )
