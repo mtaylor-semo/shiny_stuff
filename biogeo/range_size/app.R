@@ -9,37 +9,6 @@ library(shiny)
 library(dplyr)
 library(stringr)
 library(ggplot2)
-# library(shinyjs)
-
-# Global variables --------------------------------------------------------
-
-# Define global variables here.
-
-# file_list <- list.files("state_data/")
-# file_list_no_ext <- tools::file_path_sans_ext(file_list)
-#
-# states <- file_list_no_ext %>%
-#   word(start = 1, end = -2, sep = "_") %>%
-#   str_replace("_", " ") %>%
-#   str_to_title()
-#
-# taxa <-
-#   word(file_list_no_ext,
-#     start = -1,
-#     sep = "_"
-#   ) %>%
-#   str_to_title()
-#
-# state_taxa <- tibble(states, taxa)
-# state_choices <- unique(states)
-
-# # Predefined tabs. See https://stackoverflow.com/a/60229331/3832941
-# # I predefined the tabPanels here so that I didn't clutter the
-# # server code.
-# state_tab <- tabPanel("test_tab",
-#                       value = "tab2_val",
-#                       br(),
-#                       h4("this is tab2"))
 
 
 ## UI ----------------------------------------------------------------------
@@ -48,7 +17,6 @@ ui <- tagList(
   includeCSS("www/semo_mods.css"),
   navbarPage(
     id = "tabs",
-    #  theme = "semo_mods.css",
     windowTitle = "Biogeograpy: Geographic Range Size",
     title = div(
       img(src = "semo_logo.png", height = "70px"),
@@ -134,100 +102,6 @@ ui <- tagList(
         )
       )
     )
-
-
-
-    # State tab -----------------------------------------------------------
-
-    # tabPanel(
-    #   "State",
-    #   fluidRow(
-    #     column(1),
-    #     column(
-    #       2,
-    #       wellPanel(
-    #         p("Choose your state and then taxon
-    #              to see the histogram."),
-    #         selectInput(
-    #           inputId = "state",
-    #           label = "Choose a state",
-    #           choices = state_choices,
-    #           selected = "Georgia",
-    #           multiple = FALSE
-    #         ),
-    #         uiOutput("dynamic_radio_buttons"),
-    #         hr(),
-    #         downloadButton("downloadReport")
-    #       )
-    #     ),
-    #     column(5, plotOutput("state_histogram")),
-    #     column(
-    #       2,
-    #       uiOutput("state_numbers"),
-    #       hr(),
-    #       numericInput("bins", "Change the number of bins", min = 1, max = 5, value = 1, step = 1)
-    #     )
-    #   )
-    # )
-
-
-    # North America tab -------------------------------------------------------
-
-    # tabPanel(
-    #   "North America",
-    #   fluidRow(
-    #     column(1),
-    #     column(
-    #       2,
-    #       wellPanel(
-    #         p("Range size for North America."),
-    #         radioButtons("na_taxon",
-    #           label = "Choose taxon:",
-    #           choices = c("Fishes", "Mussels"),
-    #           selected = "Fishes"
-    #         )
-    #       )
-    #     ),
-    #     column(5, plotOutput("na_histogram")),
-    #     column(
-    #       2,
-    #       uiOutput("na_numbers"),
-    #       hr(),
-    #       numericInput("na_bins",
-    #         "Change the number of bins",
-    #         min = 1,
-    #         max = 10,
-    #         value = 5,
-    #         step = 1
-    #       )
-    #     )
-    #   )
-    # )
-
-
-    # California Marine Fishes ------------------------------------------------
-
-    # tabPanel(
-    #   "California Marine Fishes",
-    #   fluidRow(
-    #     column(1),
-    #     column(
-    #       2,
-    #       wellPanel(radioButtons(
-    #         inputId = "ca_marine",
-    #         label = "Choose plot type",
-    #         choices = c("Range size", "Range extent")
-    #       ))
-    #     ),
-    #     column(5, plotOutput("ca_marine_plot")),
-    #     column(
-    #       4,
-    #       p("This data set has 516 species."),
-    #       uiOutput("ca_info")
-    #       # img(src = "california.png", width = "320px")
-    #     )
-    #   )
-    # )
   )
 ) # end UI
 
@@ -285,18 +159,8 @@ server <- function(input, output, session) {
     #            pn = input$predict_na,
     #            pc = input$predict_ca)
 
-    # hideTab(inputId = "tabs", target = "Predictions")
     removeTab(inputId = "tabs", target = "Predictions")
-    # updateTabsetPanel(inputId = "tabs", selected = "State")
     appendTab(inputId = "tabs", tab = na_tab, select = TRUE)
-    # showTab(inputId = "tabs", target = "State")
-    # showTab(inputId = "tabs", target = "North America")
-    # showTab(inputId = "tabs", target = "California Marine Fishes")
-    # See https://stackoverflow.com/a/60229331/3832941
-    # for solution on appending tabs. I predefined tabs
-    # up in global vars.
-    # appendTab(inputId = "tabs", state_tab)
-    #  appendTab(inputId = "tabs", na_tab)
   })
 
   observeEvent(input$btn_next_na, {
@@ -487,7 +351,6 @@ server <- function(input, output, session) {
     }
   })
 }
-
 
 # Run the application
 shinyApp(ui = ui, server = server)
