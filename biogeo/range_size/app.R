@@ -31,6 +31,7 @@ taxa <-
   str_to_title()
 
 state_taxa <- tibble(states, taxa)
+state_choices <- unique(states)
 
 # # Predefined tabs. See https://stackoverflow.com/a/60229331/3832941
 # # I predefined the tabPanels here so that I didn't clutter the
@@ -144,7 +145,7 @@ ui <- tagList(
             selectInput(
               inputId = "state",
               label = "Choose a state",
-              choices = unique(states),
+              choices = state_choices,
               selected = "Georgia",
               multiple = FALSE
             ),
