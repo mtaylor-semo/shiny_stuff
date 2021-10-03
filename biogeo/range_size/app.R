@@ -219,7 +219,22 @@ server <- function(input, output, session) {
     dims <- dim(spp_na())
     sprintf("This data set has %d watersheds and %d species.", dims[1], dims[2])
   })
+  
+  output$prediction_na <- renderUI({
+    p("You predicted:")
+    sprintf("%s", input$predict_na)
+  })
 
+  output$prediction_state <- renderUI({
+    p("You predicted:")
+    sprintf("%s", input$predict_state)
+  })
+  
+  output$prediction_ca <- renderUI({
+    p("You predicted:")
+    sprintf("%s", input$predict_ca)
+  })
+  
   output$ca_info <- renderUI({
     if (input$ca_marine == "Range extent") {
       p("Range extent for California coastal marine fishes. Each

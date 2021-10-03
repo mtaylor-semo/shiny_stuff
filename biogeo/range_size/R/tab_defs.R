@@ -35,9 +35,11 @@ states_tab <- tabPanel(
           selected = "Georgia",
           multiple = FALSE
         ),
-        uiOutput("dynamic_radio_buttons"),
-        hr(),
-      )
+        uiOutput("dynamic_radio_buttons")
+      ),
+      hr(),
+      p(strong("You predicted:")),
+      uiOutput("prediction_state")
     ),
     column(5, plotOutput("state_histogram")),
     column(
@@ -66,12 +68,16 @@ na_tab <- tabPanel(
           choices = c("Fishes", "Mussels"),
           selected = "Fishes"
         )
-      )
+      ),
+      hr(),
+      p(strong("You predicted:")),
+      uiOutput("prediction_na")
     ),
     column(5, plotOutput("na_histogram")),
     column(
       2,
       uiOutput("na_numbers"),
+      #uiOutput("prediction_na"),
       hr(),
       actionButton(inputId = "btn_next_na", label = "Next", width = "35%")
     )
@@ -92,7 +98,10 @@ ca_tab <- tabPanel(
         inputId = "ca_marine",
         label = "Choose plot type",
         choices = c("Range size", "Range extent")
-      ))
+      )),
+      hr(),
+      p(strong("You predicted:")),
+      uiOutput("prediction_ca")
     ),
     column(5, plotOutput("ca_marine_plot")),
     column(
