@@ -6,8 +6,8 @@
 # Libraries ---------------------------------------------------------------
 
 library(shiny)
-library(dplyr)
-library(stringr)
+#library(dplyr)
+#library(stringr)
 library(ggplot2)
 
 
@@ -44,8 +44,7 @@ ui <- tagList(
       fluidRow(
         # column(1),
         column(
-          width = 2,
-          offset = 1,
+          width = 3,
           textInput("student_name",
             "Enter your name:",
             placeholder = "First Last"
