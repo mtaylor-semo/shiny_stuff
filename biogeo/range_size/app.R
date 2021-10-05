@@ -264,7 +264,7 @@ server <- function(input, output, session) {
     plots$state <- plotHistogram(dat = tibble(numWatersheds), x = numWatersheds, breaks = c(nws, 1))
 
     plots$state
-  })
+  }, res = res)
 
   ## North America histogram -------------------------------------------------
 
@@ -280,7 +280,7 @@ server <- function(input, output, session) {
     plots$na <- plotHistogram(dat = tibble(numWatersheds), x = numWatersheds, breaks = c(nws, 5))
 
     plots$na
-  })
+  }, res = res)
 
 
   ## California Marine plots -------------------------------------------------
@@ -353,7 +353,7 @@ server <- function(input, output, session) {
         scale_y_continuous(breaks = seq(-40, 70, 10)) +
         theme(axis.text.x = element_blank())
     }
-  })
+  }, res = res)
 }
 
 # Run the application
