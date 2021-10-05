@@ -245,7 +245,7 @@ server <- function(input, output, session) {
         Point Conception. Fishes are sorted (left to right on
         x-axis) in order of minimum latitude. ")
     } else {
-      img(src = "california.png", width = "320px")
+      img(src = "california.png", width = "97%")
     }
   })
 
