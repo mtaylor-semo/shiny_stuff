@@ -4,6 +4,8 @@
 # Open the data set. Can probably generalize these
 # to open csv and tsv files.
 
+res = 96
+
 open_file <- function(tx, st = NULL) {
   if (is.null(st)) {
     file_to_open <- paste0("na_data/na_", tx, ".csv")
