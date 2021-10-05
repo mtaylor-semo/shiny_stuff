@@ -39,9 +39,9 @@ na_tab <- tabPanel(
       p(strong("You predicted:")),
       uiOutput("prediction_na")
     ),
-    column(5, plotOutput("na_histogram")),
+    column(6, plotOutput("na_histogram")),
     column(
-      2,
+      3,
       uiOutput("na_numbers"),
       #uiOutput("prediction_na"),
       hr(),
@@ -74,9 +74,9 @@ states_tab <- tabPanel(
       p(strong("You predicted:")),
       uiOutput("prediction_state")
     ),
-    column(5, plotOutput("state_histogram")),
+    column(6, plotOutput("state_histogram")),
     column(
-      2,
+      3,
       uiOutput("state_numbers"),
       hr(),
       actionButton(inputId = "btn_next_state", label = "Next", width = "35%")
@@ -103,9 +103,9 @@ ca_tab <- tabPanel(
       p(strong("You predicted:")),
       uiOutput("prediction_ca")
     ),
-    column(5, plotOutput("ca_marine_plot")),
+    column(6, plotOutput("ca_marine_plot")),
     column(
-      4,
+      3,
       p("This data set has 516 species."),
       uiOutput("ca_info"),
       downloadButton("downloadReport")
