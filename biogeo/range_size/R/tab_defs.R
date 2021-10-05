@@ -1,3 +1,6 @@
+library(dplyr)
+library(stringr)
+
 file_list <- list.files("state_data/")
 file_list_no_ext <- tools::file_path_sans_ext(file_list)
 
@@ -17,14 +20,44 @@ state_taxa <- tibble(states, taxa)
 state_choices <- unique(states)
 
 
+# Define North America Tab ------------------------------------------------
+
+na_tab <- tabPanel(
+  "North America",
+  fluidRow(
+    column(#style="padding-left:3%", # Same for paddingg-top, etc.
+      3,
+      wellPanel(
+        p("Range size for North America."),
+        radioButtons("na_taxon",
+          label = "Choose taxon:",
+          choices = c("Fishes", "Mussels"),
+          selected = "Fishes"
+        )
+      ),
+      hr(),
+      p(strong("You predicted:")),
+      uiOutput("prediction_na")
+    ),
+    column(5, plotOutput("na_histogram")),
+    column(
+      2,
+      uiOutput("na_numbers"),
+      #uiOutput("prediction_na"),
+      hr(),
+      actionButton(inputId = "btn_next_na", label = "Next", width = "35%")
+    )
+  )
+)
+
+
 # Define States tab -------------------------------------------------------
 
 states_tab <- tabPanel(
   "State",
   fluidRow(
-    column(1),
     column(
-      2,
+      3,
       wellPanel(
         p("Choose your state and then taxon
                  to see the histogram."),
@@ -53,38 +86,6 @@ states_tab <- tabPanel(
 
 
 
-# Define North America Tab ------------------------------------------------
-
-na_tab <- tabPanel(
-  "North America",
-  fluidRow(
-    column(1),
-    column(
-      2,
-      wellPanel(
-        p("Range size for North America."),
-        radioButtons("na_taxon",
-          label = "Choose taxon:",
-          choices = c("Fishes", "Mussels"),
-          selected = "Fishes"
-        )
-      ),
-      hr(),
-      p(strong("You predicted:")),
-      uiOutput("prediction_na")
-    ),
-    column(5, plotOutput("na_histogram")),
-    column(
-      2,
-      uiOutput("na_numbers"),
-      #uiOutput("prediction_na"),
-      hr(),
-      actionButton(inputId = "btn_next_na", label = "Next", width = "35%")
-    )
-  )
-)
-
-
 # Define California Marine Tab --------------------------------------------
 
 
@@ -92,8 +93,7 @@ ca_tab <- tabPanel(
   "California Marine Fishes",
   fluidRow(
     column(
-      2,
-      offset = 1,
+      3,
       wellPanel(radioButtons(
         inputId = "ca_marine",
         label = "Choose plot type",
