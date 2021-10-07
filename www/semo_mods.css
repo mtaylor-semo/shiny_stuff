@@ -45,6 +45,18 @@
   background-color: #FFFFFF;
 } 
 
+/*.btn:active {background: #9d2235 !important}*/
+
+/*.btn, .btn-default {
+  border-color: #003B5A;
+}*/
+
+.btn:hover, .btn:active, .btn:focus  {
+  color: #fff; 
+  background: #9d2235 !important; 
+  border: #003B5C;
+  /*background: #9d2235 !important*/
+}
 /*.navbar-nav .navbar-brand {
    display: inline-block;
    text-align: center; 
@@ -87,7 +99,7 @@ body {font-family:"Lato",Helvetica,Arial,sans-serif;
   color:#333;
   background-color: #fff}
 
-hr.custom {border-color: #003B5A;}
+hr.custom {color: #003B5A;}
 /* p {margin:0 0 10px;
   color:#9D2235}  /* SEMO Cardiac */
 
@@ -101,6 +113,11 @@ font-size: 80%;
 padding: 0px;
 margin-right:-2px;
 margin-left:-2px;}
+
+.well {
+  border:1px solid #003B5A; /* SEMO Riverfront */
+  background: #ffffff; /* White*/
+}
  
 /*.form-group .control-label{
   color:#003B5A} /* SEMO Riverfront */
@@ -112,10 +129,6 @@ margin-left:-2px;}
   color: white;
 }
 
-.well {
-  border:1px solid #003B5A; /* SEMO Riverfront */
-  background: #ffffff; /* White*/
-}
 /*
 #.js-irs-0 .irs-single, .js-irs-0 .irs-bar-edge, .js-irs-0 .irs-bar {
 #background: #000069;
