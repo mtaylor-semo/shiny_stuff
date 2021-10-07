@@ -52,53 +52,62 @@ ui <- tagList(
           hr(),
           p(),
           p("Enter your predictions at right, then press the
-               'Next' button.")
+               'Next' button."),
         ),
         column(
           3,
-          p("What do you predict for the state level? Will
+          p(strong("What do you predict for North America?")),
+          p("Will
+               most species have small, moderate, or large
+               range sizes?"),
+          textAreaInput(
+            inputId = "predict_na",
+            label = NULL, #"Enter your prediction:",
+            rows = 4,
+            placeholder = "North America prediction…"
+            ),
+          p(),
+          hr()
+        ),
+        
+        column(
+          3,
+          p(strong("What do you predict for the state level?")),
+          p("Will
                most species have small, moderate, or large range
                sizes?"),
           textAreaInput(
-            "predict_state",
-            "Enter your prediction in this space:",
+            inputId = "predict_state",
+            label = NULL, #"Enter your prediction:",
             rows = 4,
             placeholder = "State prediction…"
           ),
           p(),
-          hr(),
-          p("What do you predict for North America? Will
-               most species have small, moderate, or large
-               range sizes?"),
-          textAreaInput(
-            "predict_na",
-            "Enter your prediction in this space:",
-            rows = 4,
-            placeholder = "North America prediction…"
-          )
+          hr()
         ),
+        
         column(
           3,
-          p("What do you predict for the California marine
-               fishes? Will most species have small, moderate,
+          p(strong("What do you predict for California?")),
+          p("Will most species have small, moderate,
                or large range sizes?"),
           textAreaInput(
-            "predict_ca",
-            "Enter your prediction in this space:",
+            inputId = "predict_ca",
+            label = NULL, #"Enter your prediction:",
             rows = 4,
             placeholder = "California prediction…"
           ),
           p(),
           hr(),
           p(),
-          # span(textOutput("fprediction_error"), style = "color:#9D2235"),
-          # actionButton(inputId = "next_pred", label = "Next", width = "35%")
-        ),
-        column(
-          width = 2,
           span(textOutput("prediction_error"), style = "color:#9D2235"),
           actionButton(inputId = "btn_next_pred", label = "Next", width = "35%")
         )
+        #column(
+        #  width = 2,
+        #  span(textOutput("prediction_error"), style = "color:#9D2235"),
+        #  actionButton(inputId = "btn_next_pred", label = "Next", width = "35%")
+        #)
       )
     )
   )
