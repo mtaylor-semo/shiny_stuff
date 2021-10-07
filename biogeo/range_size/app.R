@@ -103,11 +103,6 @@ ui <- tagList(
           span(textOutput("prediction_error"), style = "color:#9D2235"),
           actionButton(inputId = "btn_next_pred", label = "Next", width = "35%")
         )
-        #column(
-        #  width = 2,
-        #  span(textOutput("prediction_error"), style = "color:#9D2235"),
-        #  actionButton(inputId = "btn_next_pred", label = "Next", width = "35%")
-        #)
       )
     )
   )
@@ -145,28 +140,42 @@ server <- function(input, output, session) {
     open_file(tx = input$na_taxon)
   })
 
-  plots <- reactiveValues(state = NULL, na = NULL, ca = NULL)
+  plots <- reactiveValues(na = NULL, state = NULL, ca = NULL)
+  
+  results <- reactiveValues(na = NULL, state = NULL, ca = NULL)
 
 
   # Button observers --------------------------------------------------------
 
   observeEvent(input$btn_next_pred, {
+    if (is.null(input$na_taxon)) {
     # Comment out for development.
-    # pred_check(sn = input$student_name,
-    #            ps = input$predict_state,
-    #            pn = input$predict_na,
-    #            pc = input$predict_ca)
+     # pred_check(sn = input$student_name,
+     #            ps = input$predict_state,
+     #            pn = input$predict_na,
+     #            pc = input$predict_ca)
 
     removeTab(inputId = "tabs", target = "Predictions")
     appendTab(inputId = "tabs", tab = na_tab, select = TRUE)
+    } else {
+      showTab(inputId = "tabs", target = "North America", select = TRUE)
+    }
   })
 
   observeEvent(input$btn_next_na, {
-    appendTab(inputId = "tabs", tab = states_tab, select = TRUE)
+    if (is.null(input$state)) {
+      appendTab(inputId = "tabs", tab = states_tab, select = TRUE)
+    } else{
+      showTab(inputId = "tabs", target = "State", select = TRUE)
+    }
   })
 
   observeEvent(input$btn_next_state, {
-    appendTab(inputId = "tabs", tab = ca_tab, select = TRUE)
+    if (is.null(input$ca_marine)) {
+      appendTab(inputId = "tabs", tab = ca_tab, select = TRUE)  
+    } else {
+      showTab(inputId = "tabs", target = "California Marine Fishes", select = TRUE) 
+    }
   })
 
 
@@ -220,12 +229,12 @@ server <- function(input, output, session) {
 
   output$state_numbers <- renderUI({
     dims <- dim(spp())
-    sprintf("This data set has %d watersheds and %d species.", dims[1], dims[2])
+    sprintf("%s has %d watersheds and %d species of %s.", input$state, dims[1], dims[2], str_to_lower(input$taxon))
   })
 
   output$na_numbers <- renderUI({
     dims <- dim(spp_na())
-    sprintf("This data set has %d watersheds and %d species.", dims[1], dims[2])
+    sprintf("North America has %d watersheds and %d species of %s.", dims[1], dims[2], str_to_lower(input$na_taxon))
   })
   
   output$prediction_na <- renderUI({
