@@ -11,6 +11,27 @@
  *//*! normalize.css v3.0.3 | MIT License | github.com/necolas/normalize.css *
  */
 
+/* SEMO Color palette
+#C8102E Southeast Red
+#000000 Rich Black
+#9D2235 Cardiac Red
+#003B5A Riverfront
+#840B55 Plum
+#71C5E8 Fountain
+#279989 Terrace
+#A4DBE8 Sky Blue
+#DBE442 Gum Tree
+#FF5C35 Entrepreneurial Orange
+#5B6670 Pewter
+#7A6855 Dome
+#899064 Military
+#AD7C59 Copper
+#A2AAAD Silver
+#8FC964 Campus
+#FFFFFF White
+*/
+
+
 /* Override default Shiny bootstrap settings for a few items. */
 
 /* For now. May or may not keep */
@@ -19,6 +40,10 @@
 .navbar-default, .navbar-brand {font-family:"Archivo Black", Helvetica, Arial, 
   sans-serif;}
 
+.navbar-default .navbar-nav>.active>a, .navbar-default .navbar-nav>.active>a:focus, .navbar-default .navbar-nav>.active>a:hover{
+  color: #C8102E; /*SEMO Cardiac */
+  background-color: #FFFFFF;
+} 
 
 /*.navbar-nav .navbar-brand {
    display: inline-block;
