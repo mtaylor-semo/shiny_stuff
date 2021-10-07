@@ -108,6 +108,9 @@ ca_tab <- tabPanel(
       3,
       p("This data set has 516 species."),
       uiOutput("ca_info"),
+      p(),
+      hr(),
+      p(),
       downloadButton("downloadReport")
       # img(src = "california.png", width = "320px")
     )
