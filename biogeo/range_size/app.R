@@ -180,41 +180,6 @@ server <- function(input, output, session) {
 
 
 
-  # Report Download ---------------------------------------------------------
-
-  # Report output idea from Shiny Gallery
-  output$downloadReport <- downloadHandler(
-    filename = function() {
-      paste("geographic_range", sep = ".", "pdf")
-    },
-    content = function(file) {
-      notification_id <- showNotification(
-        "Generating report for download.",
-        duration = NULL,
-        closeButton = FALSE,
-        type = "message"
-      )
-      src <- normalizePath("range_report.Rmd")
-
-      # temporarily switch to the temp dir, in case you do not have write
-      # permission to the current working directory
-      owd <- setwd(tempdir())
-      on.exit(setwd(owd))
-      file.copy(src, "range_report.Rmd", overwrite = TRUE)
-
-
-      library(rmarkdown)
-      out <- render(
-        "range_report.Rmd",
-        pdf_document(latex_engine = "lualatex")
-      )
-      file.rename(out, file)
-      on.exit(removeNotification(notification_id), add = TRUE)
-    }
-  )
-
-
-
   ## Outputs -------------------------------------------------------------
 
   output$dynamic_radio_buttons <- renderUI({
@@ -241,7 +206,7 @@ server <- function(input, output, session) {
     p("You predicted:")
     sprintf("%s", input$predict_na)
   })
-
+  
   output$prediction_state <- renderUI({
     p("You predicted:")
     sprintf("%s", input$predict_state)
@@ -289,8 +254,7 @@ server <- function(input, output, session) {
   output$na_histogram <- renderPlot({
     numWatersheds <- colSums(spp_na())
     numSpecies <- rowSums(spp_na())
-    # bins <-
-    #   seq(min(numWatersheds), max(numWatersheds))
+
     dat <- tibble(numWatersheds)
 
     nws <- nrow(spp_na()) # Number of watersheds for x-axis
@@ -372,6 +336,40 @@ server <- function(input, output, session) {
         theme(axis.text.x = element_blank())
     }
   }, res = res)
+  # Report Download ---------------------------------------------------------
+  
+  # Report output idea from Shiny Gallery
+  output$downloadReport <- downloadHandler(
+    filename = function() {
+      stu_name <- str_to_lower(str_split(input$student_name, " ", simplify = TRUE))
+      paste(stu_name[2], stu_name[1], "geographic_range.pdf", sep = "_")
+    },
+    content = function(file) {
+      notification_id <- showNotification(
+        "Generating report for download.",
+        duration = NULL,
+        closeButton = FALSE,
+        type = "message"
+      )
+      src <- normalizePath("range_report.Rmd")
+      
+      # temporarily switch to the temp dir, in case you do not have write
+      # permission to the current working directory
+      owd <- setwd(tempdir())
+      on.exit(setwd(owd))
+      file.copy(src, "range_report.Rmd", overwrite = TRUE)
+      
+      
+      library(rmarkdown)
+      out <- render(
+        "range_report.Rmd",
+        pdf_document(latex_engine = "lualatex")
+      )
+      file.rename(out, file)
+      on.exit(removeNotification(notification_id), add = TRUE)
+    }
+  )
+  
 }
 
 # Run the application
