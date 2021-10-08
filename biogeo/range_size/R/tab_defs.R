@@ -39,12 +39,21 @@ na_tab <- tabPanel(
       p(strong("You predicted:")),
       uiOutput("prediction_na")
     ),
-    column(6, plotOutput("na_histogram")),
+    column(6, plotOutput("na_histogram"),
+           p(),
+           hr(),
+           p(),
+           uiOutput("na_numbers")),
     column(
       3,
-      uiOutput("na_numbers"),
-      #uiOutput("prediction_na"),
+      p("Do the results agree with your prediction? Explain below, 
+      then press the Next button."),
+      textAreaInput(inputId = "na_result",
+                    label = NULL,
+                    rows = 5),
+      p(),
       hr(),
+      p(),
       actionButton(inputId = "btn_next_na", label = "Next", width = "35%")
     )
   )
@@ -74,11 +83,21 @@ states_tab <- tabPanel(
       p(strong("You predicted:")),
       uiOutput("prediction_state")
     ),
-    column(6, plotOutput("state_histogram")),
+    column(6, plotOutput("state_histogram"),
+           p(),
+           hr(),
+           p(),
+           uiOutput("state_numbers")),
     column(
       3,
-      uiOutput("state_numbers"),
+      p("Do the results agree with your prediction? Explain below, 
+      then press the Next button."),
+      textAreaInput(inputId = "state_result",
+                    label = NULL,
+                    rows = 5),
+      p(),
       hr(),
+      p(),
       actionButton(inputId = "btn_next_state", label = "Next", width = "35%")
     )
   )
@@ -103,14 +122,26 @@ ca_tab <- tabPanel(
       p(strong("You predicted:")),
       uiOutput("prediction_ca")
     ),
-    column(6, plotOutput("ca_marine_plot")),
+    column(6, plotOutput("ca_marine_plot"),
+           p(),
+           hr(),
+           p(),
+           p("This data set has 516 species.")),
     column(
       3,
-      p("This data set has 516 species."),
       uiOutput("ca_info"),
       p(),
       hr(),
       p(),
+      p("Do the results agree with your prediction? Explain below, 
+      then press the Next button."),
+      textAreaInput(inputId = "ca_result",
+                    label = NULL,
+                    rows = 5),
+      p(),
+      hr(),
+      p(),
+      
       downloadButton("downloadReport")
       # img(src = "california.png", width = "320px")
     )
