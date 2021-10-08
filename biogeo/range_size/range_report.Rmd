@@ -9,23 +9,15 @@ header-includes:
   \usepackage{microtype}
   \usepackage[sc]{titlesec}
 ---
-\textsc{Biogeography: Geographic range size \hfill `r input$student_name`}
-
-## Predictions
-
-For `r paste(input$state, input$taxon)`, you wrote *`r input$predict_state`*
-
-For North American `r paste(input$na_taxon)`, you wrote *`r input$predict_na`*
-
-For California marine fishes, you wrote *`r input$predict_ca`*
 
 ***
+\textsc{Biogeography: Geographic range size \hfill `r input$student_name`}
 
-Histogram of `r paste(input$state, input$taxon)` for geographic range size.
 
-```{r fig.dim=c(3,2), echo=FALSE}
-plots$state
-```
+
+## North American Taxa
+
+For North American `r input$na_taxon`, you predicted *`r input$predict_na`*
 
 Histogram of North American `r input$na_taxon` for geographic range size.
 
@@ -33,8 +25,35 @@ Histogram of North American `r input$na_taxon` for geographic range size.
 plots$na
 ```
 
+Based on these results, you explained *`r input$na_result`.*
+
+***
+
+## State
+
+For `r paste(input$state, input$taxon)`, you predicted *`r input$predict_state`*
+
+Histogram of `r paste(input$state, input$taxon)` for geographic range size.
+
+```{r fig.dim=c(3,2), echo=FALSE}
+plots$state
+```
+
+Based on these results, you explained *`r input$state_result`.*
+
+***
+
+For California marine fishes, you predicted *`r input$predict_ca`*
+
 Histogram of California Marine Fishes for geographic range size.
 
 ```{r fig.dim=c(3,2), echo=FALSE}
 plots$ca
 ```
+
+Based on these results, you explained *`r input$ca_result`.*
+
+***
+
+At the end, require students to write a summary of what they learned.
+
