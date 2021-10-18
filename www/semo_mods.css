@@ -49,6 +49,10 @@
   background-color: #FFFFFF;
 } 
 
+.progress-bar{
+  background-color: #9D2235;
+}
+
 /*.btn:active {background: #9d2235 !important}*/
 
 /*.btn, .btn-default {
@@ -81,6 +85,19 @@
   vertical-align: center;
   color: #000;
 }
+
+\*
+.item .after {
+  color: #9d2235
+}*\
+
+.selectize-input {
+  color: #9d2235
+}
+
+.selectize-dropdown .active {
+  background: #9d2235 !important;
+  color: #ffffff !important;}
 
 /*
 .navbar-nav > li > a, .navbar-brand {
