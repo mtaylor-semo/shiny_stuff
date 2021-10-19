@@ -11,7 +11,7 @@ get_grade_file <- function(filename) {
   )
 }
 
-trim_fields <- function(.data) {
+trim_lecture_cols <- function(.data) {
   select(
     .data,
     `Student`, # Select the fields required by Canvas. See above.
@@ -20,9 +20,20 @@ trim_fields <- function(.data) {
     `SIS Login ID`,
     `Section`
   ) %>%
-    slice(-1) # Remove first row after the column names.
+    slice(-c(1:2)) # Remove first row after the column names.
 }
 
+# Probably should have more of the Canvas Columns to avoid duplicate
+# names such as Smith, John. SIS User ID, eg, would avoid dupes.
+# Could then merge off of them.
+trim_lab_cols <- function(.data) {
+  select(
+    .data,
+    `Student`, 
+    `Final Grade`,
+    everything()
+  )
+}
 lab_fields <- function(.data, oldName, newName) {
   select(
     .data,

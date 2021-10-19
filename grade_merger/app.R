@@ -63,6 +63,7 @@ ui <- tagList(
         fileInput(
           inputId = "choose063",
           label = "Choose 063 grades file",
+          multiple = TRUE,
           accept = c(
             "text/csv",
             "text/comma-separated-values",
@@ -110,7 +111,9 @@ server <- function(input, output, session) {
 
   file163 <- reactive({
     req(input$choose163)
-    get_grade_file(input$choose163)
+    #get_grade_file(input$choose163)
+    input$choose163$datapath %>% 
+      purrr::map_dfr(~ read_csv(.x, show_col_types = FALSE))
   })
 
   output$columns163 <- renderUI({
@@ -127,7 +130,7 @@ server <- function(input, output, session) {
   output$filename163 <- renderText(input$choose163$name)
 
   output$data163 <- renderReactable({
-    reactable(file163() %>% trim_fields(),
+    reactable(file163() %>% trim_lecture_cols(),
       pagination = FALSE,
       highlight = FALSE,
       height = 150,
@@ -139,12 +142,10 @@ server <- function(input, output, session) {
 
   # Open 063 data -----------------------------------------------------------
 
-  # NOTE: This assumes all lab grades are in a single file. 
-  # May have to modify to select and read from multiple files 
-  # before joining.
   file063 <- reactive({
     req(input$choose063)
-    get_grade_file(input$choose063) %>% 
+    input$choose063$datapath %>% 
+      purrr::map_dfr(~ read_csv(.x)) %>% 
       arrange(Student)
   })
 
@@ -154,13 +155,14 @@ server <- function(input, output, session) {
       inputId = "cols063",
       label = "Choose column with lab grades:",
       choices = columns,
+      selected = "Final Grade"
     )
   })
 
   output$filename063 <- renderText(input$choose063$name)
 
   output$data063 <- renderReactable({
-    reactable(file063(),
+    reactable(file063() %>% trim_lab_cols(),
       pagination = FALSE,
       highlight = FALSE,
       height = 150,
@@ -201,7 +203,8 @@ server <- function(input, output, session) {
   # 
   observeEvent(input$merge_button, {
     merged$dat <- left_join(
-      file163() %>% trim_fields(),
+      file163() %>% trim_lecture_cols() %>%
+        add_row(Student = "Points possible", .before = 1),
       file063() %>% select(Student, !!input$cols063)
     )
 
