@@ -29,12 +29,12 @@ ui <- navbarPage(theme = "semo_mods.css",
         any other taxonomic level. "
       ),
       p(
-        "The \"Data First\" tab starts with a presence-absence (0/1) character matrix
-        that you use as data to build a tree."
+        "The \"Data First\" tab starts with a presence-absence (0/1) matrix of character
+        homologies that you use as data to build a tree."
       ),
       p(
         "The \"Tree First\" tab starts with a phylogenetic tree that you use to 
-        make the presence-absence (0/1) character matrix. This will help you think 
+        make the presence-absence (0/1) homology character matrix. This will help you think 
         about phylogenetic trees in a different way."
       ),
       p(
@@ -55,9 +55,9 @@ ui <- navbarPage(theme = "semo_mods.css",
                   step = 1),
       p("Choose the number of taxa and then press the `New dataset` button.
                 Draw the tree from resulting character matrix. Each row represents one taxon,
-               indicated by T1, T2, etc. Each column repesents a character,
-               indicated by C1, C2, etc. Click on `Show answer` to reveal the correct tree.
-               The number of characters is always one less than the number
+               indicated by T1, T2, etc. Each column repesents a homology,
+               indicated by H1, H2, etc. Click on `Show answer` to reveal the correct tree.
+               The number of homologies is always one less than the number
                of taxa."),
       actionButton("new_matrix",
                    "New dataset"),
@@ -81,10 +81,10 @@ tabPanel("Tree First",
                        value = 7,
                        step = 1),
            p("Choose the number of taxa and then press the `New tree` button.
-                    Build the character matrix from the resulting tree. Make each row 
+                    Build the homology character matrix from the resulting tree. Make each row 
                     represent one taxon, using T1, T2, etc. Make each column repesents 
-                    one character, using C1, C2, etc. Click on `Show answer` to reveal the 
-                    correct matrix. The number of characters is always one less than the 
+                    one homology, using H1, H2, etc. Click on `Show answer` to reveal the 
+                    correct matrix. The number of homologies is always one less than the 
                     number of taxa."),
            actionButton("new_tree",
                         "New tree"),
@@ -101,7 +101,8 @@ tabPanel("Tree First",
 
 
 # Define server logic required to draw a histogram
-server <- function(input, output) {
+server <- function(input, output, session) {
+  session$onSessionEnded(stopApp)
   
 #   showTree <- reactiveVal(FALSE)
   
@@ -122,7 +123,7 @@ server <- function(input, output) {
       char_mat[,i] <- replace(char_mat[,i], y <- desc[[i]], 1)
     }
     
-    char_names <- paste0("C",seq(1,nchar))
+    char_names <- paste0("H",seq(1,nchar))
 
     char_names <- sample(char_names, nchar, replace = FALSE)
 
