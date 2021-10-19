@@ -111,7 +111,6 @@ server <- function(input, output, session) {
 
   file163 <- reactive({
     req(input$choose163)
-    #get_grade_file(input$choose163)
     input$choose163$datapath %>% 
       purrr::map_dfr(~ read_csv(.x, show_col_types = FALSE))
   })
