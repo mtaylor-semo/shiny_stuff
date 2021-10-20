@@ -165,6 +165,7 @@ server <- function(input, output, session) {
       pagination = FALSE,
       highlight = FALSE,
       height = 150,
+      wrap = FALSE,
       width = 700
     )
   })
@@ -204,11 +205,12 @@ server <- function(input, output, session) {
     merged$dat <- left_join(
       file163() %>% trim_lecture_cols() %>%
         add_row(Student = "Points possible", .before = 1),
-      file063() %>% select(Student, !!input$cols063)
+      file063() %>% select(Student, `SIS Login ID`, !!input$cols063),
+      by = c("Student", "SIS Login ID")
     )
 
     # Total percentage points for the lab grade
-    merged$dat[1, 6] <- 100
+    #merged$dat[1, 6] <- 100
 
     # Did column exist in BI 163 grades?
     if (input$cols163 == "No column yet") {
@@ -218,6 +220,7 @@ server <- function(input, output, session) {
     }
     colnames(merged$dat)[colnames(merged$dat) == input$cols063] <- colName # input$cols163
     # }
+    
   })
 
   output$data_merged <- renderReactable({
