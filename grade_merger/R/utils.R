@@ -30,7 +30,7 @@ trim_lab_cols <- function(.data) {
   select(
     .data,
     `Student`, 
-    `Final Grade`,
+    `Current Score`,
     everything()
   )
 }

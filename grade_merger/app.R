@@ -154,7 +154,7 @@ server <- function(input, output, session) {
       inputId = "cols063",
       label = "Choose column with lab grades:",
       choices = columns,
-      selected = "Final Grade"
+      selected = "Current Score"
     )
   })
 
