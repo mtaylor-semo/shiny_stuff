@@ -30,6 +30,7 @@ trim_lab_cols <- function(.data) {
   select(
     .data,
     `Student`, 
+    `SIS Login ID`,
     `Current Score`,
     everything()
   )
