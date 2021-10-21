@@ -111,8 +111,7 @@ server <- function(input, output, session) {
 
   file163 <- reactive({
     req(input$choose163)
-    input$choose163$datapath %>% 
-      purrr::map_dfr(~ read_csv(.x, show_col_types = FALSE))
+    read_csv(input$choose163$datapath)
   })
 
   output$columns163 <- renderUI({
@@ -143,8 +142,14 @@ server <- function(input, output, session) {
 
   file063 <- reactive({
     req(input$choose063)
-    input$choose063$datapath %>% 
-      purrr::map_dfr(~ read_csv(.x)) %>% 
+    input$choose063$datapath %>%
+      purrr::map_dfr(~ read_csv(.x, col_types = list(
+        .default = col_double(),
+        Student = col_character(),
+        `SIS Login ID` = col_character(),
+        Section = col_character(),
+        `Current Score` = col_double()
+      ))) %>%
       arrange(Student)
   })
 
@@ -200,17 +205,16 @@ server <- function(input, output, session) {
     }
   })
 
-  # 
+  #
   observeEvent(input$merge_button, {
     merged$dat <- left_join(
       file163() %>% trim_lecture_cols() %>%
         add_row(Student = "Points possible", .before = 1),
-      file063() %>% select(Student, `SIS Login ID`, !!input$cols063),
-      by = c("Student", "SIS Login ID")
+      file063() %>% select(Student, `SIS Login ID`, !!input$cols063)
     )
 
     # Total percentage points for the lab grade
-    #merged$dat[1, 6] <- 100
+    merged$dat[1, 6] <- 100
 
     # Did column exist in BI 163 grades?
     if (input$cols163 == "No column yet") {
@@ -220,7 +224,6 @@ server <- function(input, output, session) {
     }
     colnames(merged$dat)[colnames(merged$dat) == input$cols063] <- colName # input$cols163
     # }
-    
   })
 
   output$data_merged <- renderReactable({
