@@ -111,7 +111,8 @@ server <- function(input, output, session) {
 
   file163 <- reactive({
     req(input$choose163)
-    read_csv(input$choose163$datapath)
+    read_csv(input$choose163$datapath) %>% 
+      filter(Student != "Points Possible")
   })
 
   output$columns163 <- renderUI({
@@ -142,14 +143,22 @@ server <- function(input, output, session) {
 
   file063 <- reactive({
     req(input$choose063)
+
     input$choose063$datapath %>%
-      purrr::map_dfr(~ read_csv(.x, col_types = list(
-        .default = col_double(),
-        Student = col_character(),
-        `SIS Login ID` = col_character(),
-        Section = col_character(),
-        `Current Score` = col_double()
-      ))) %>%
+      purrr::map_dfr(
+        ~ read_csv(
+          .x,
+          col_types = list(
+            .default = col_double(),
+            Student = col_character(),
+            `SIS Login ID` = col_character(),
+            Section = col_character()
+          )
+        )
+      ) %>%
+      filter(
+        Student != "Points Possible"
+      ) %>%
       arrange(Student)
   })
 
@@ -209,7 +218,7 @@ server <- function(input, output, session) {
   observeEvent(input$merge_button, {
     merged$dat <- left_join(
       file163() %>% trim_lecture_cols() %>%
-        add_row(Student = "Points possible", .before = 1),
+        add_row(Student = "Points Possible", .before = 1),
       file063() %>% select(Student, `SIS Login ID`, !!input$cols063)
     )
 
