@@ -1,6 +1,11 @@
 # Global functions --------------------------------------------------------
 # for the grade_merger shiny app.
 
+
+#####
+## Ignoring this function for now. May try to adapt for use with
+## purrr.
+####
 # get_grade_file <- function(filename) {
 #   ext <- tools::file_ext(filename$name)
 #   switch(
@@ -11,6 +16,8 @@
 #   )
 # }
 
+# Keep only the columns from the lecture grades required 
+# by Canvas for importing.
 trim_lecture_cols <- function(.data) {
   select(
     .data,
@@ -20,12 +27,13 @@ trim_lecture_cols <- function(.data) {
     `SIS Login ID`,
     `Section`
   ) %>%
+    ## My data has two rows to remove because I have a manual posting.
+    ## Not all files will have that. Need to adjust to accommodate.
     slice(-c(1:2)) # Remove first row after the column names.
 }
 
-# Probably should have more of the Canvas Columns to avoid duplicate
-# names such as Smith, John. SIS User ID, eg, would avoid dupes.
-# Could then merge off of them.
+# Arrange the lab columns so that Current Score, the default
+# lab grade column, is displayed after the required columns.
 trim_lab_cols <- function(.data) {
   select(
     .data,
