@@ -26,10 +26,10 @@ trim_lecture_cols <- function(.data) {
     `SIS User ID`,
     `SIS Login ID`,
     `Section`
-  ) %>%
+  ) #%>%
     ## My data has two rows to remove because I have a manual posting.
     ## Not all files will have that. Need to adjust to accommodate.
-    slice(-c(1:2)) # Remove first row after the column names.
+   # slice(-c(1:2)) # Remove first row after the column names.
 }
 
 # Arrange the lab columns so that Current Score, the default
