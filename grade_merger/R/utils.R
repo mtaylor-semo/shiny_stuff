@@ -1,15 +1,15 @@
 # Global functions --------------------------------------------------------
 # for the grade_merger shiny app.
 
-get_grade_file <- function(filename) {
-  ext <- tools::file_ext(filename$name)
-  switch(
-    ext,
-    csv = read_csv(filename$datapath),
-    tsv = read_tsv(filename$datapath),
-    validate("Invalid file; Please upload a .csv file")
-  )
-}
+# get_grade_file <- function(filename) {
+#   ext <- tools::file_ext(filename$name)
+#   switch(
+#     ext,
+#     csv = read_csv(filename$datapath),
+#     tsv = read_tsv(filename$datapath),
+#     validate("Invalid file; Please upload a .csv file")
+#   )
+# }
 
 trim_lecture_cols <- function(.data) {
   select(
@@ -29,16 +29,13 @@ trim_lecture_cols <- function(.data) {
 trim_lab_cols <- function(.data) {
   select(
     .data,
-    `Student`, 
+    `Student`, # Select the fields required by Canvas. See above.
+    `ID`,
+    `SIS User ID`,
     `SIS Login ID`,
+    `Section`,
     `Current Score`,
     everything()
   )
 }
-lab_fields <- function(.data, oldName, newName) {
-  select(
-    .data,
-    `Student`, # Select the fields required by Canvas. See above.
-    `newName` = `oldName`
-  )
-}
+
