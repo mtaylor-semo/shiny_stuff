@@ -219,7 +219,7 @@ server <- function(input, output, session) {
     merged$dat <- left_join(
       file163() %>% trim_lecture_cols() %>%
         add_row(Student = "Points Possible", .before = 1),
-      file063() %>% select(Student, `SIS Login ID`, !!input$cols063)
+      file063() %>% select(Student, `SIS Login ID`, input$cols063)
     )
 
     # Total percentage points for the lab grade
