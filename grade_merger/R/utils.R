@@ -2,7 +2,6 @@
 # for the grade_merger shiny app.
 
 get_grade_file <- function(filename, columnTypes = NULL) {
-  cat(file = stderr(), str(filename))
   ext <- tools::file_ext(filename)
   switch(
     ext,
