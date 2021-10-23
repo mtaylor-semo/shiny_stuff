@@ -1,23 +1,21 @@
-#
-# This is a Shiny web application. You can run the application by clicking
-# the 'Run App' button above.
-#
-# Find out more about building applications with Shiny here:
-#
-#    http://shiny.rstudio.com/
-#
+##############
+# Grade Merger
+##############
+
+# This app was written to merge the Canvas grade files from BI 063
+# into the Canvas grade file from BI 163. The merged result can be
+# downloaded as a csv file to import the lab grades back into Canvas.
 
 library(shiny)
 library(readr)
 library(dplyr)
 library(reactable)
 
-
 # UI ----------------------------------------------------------------------
 
 ui <- tagList(
   includeCSS("www/semo_mods.css"),
-  tags$body(style = "font-size:12px;"), # override semo_mods.css
+  tags$body(style = "font-size:12px;"), # override semo_mods.css for font size
   fluidPage(
     title = "BI 163 Grade Merger",
     fluidRow(
@@ -112,8 +110,7 @@ server <- function(input, output, session) {
   file163 <- reactive({
     req(input$choose163)
     input$choose163$datapath %>%
-      purrr::map_dfr(~ get_grade_file(.x)) %>% 
-    #read_csv(input$choose163$datapath) %>% 
+      purrr::map_dfr(~ get_grade_file(.x)) %>%
       filter(Student != "Points Possible")
   })
 
@@ -145,30 +142,20 @@ server <- function(input, output, session) {
 
   file063 <- reactive({
     req(input$choose063)
-    
+
     column_types <- list(
-            .default = col_double(),
-             Student = col_character(),
-             `SIS Login ID` = col_character(),
-             Section = col_character()
+      .default = col_double(),
+      Student = col_character(),
+      `SIS Login ID` = col_character(),
+      Section = col_character()
     )
 
     input$choose063$datapath %>%
       purrr::map_dfr(
-        ~ get_grade_file(
-          .x, 
-          columnTypes = column_types)) %>% 
-      # purrr::map_dfr(
-      #   ~ read_csv(
-      #     .x,
-      #     col_types = list(
-      #       .default = col_double(),
-      #       Student = col_character(),
-      #       `SIS Login ID` = col_character(),
-      #       Section = col_character()
-      #     )
-      #   )
-      # ) %>%
+        ~ get_grade_file(.x,
+          columnTypes = column_types
+        )
+      ) %>%
       filter(
         Student != "Points Possible"
       ) %>%
