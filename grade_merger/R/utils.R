@@ -6,6 +6,23 @@
 ## Ignoring this function for now. May try to adapt for use with
 ## purrr.
 ####
+get_grade_file <- function(filename, columnTypes = NULL) {
+  cat(file = stderr(), str(filename))
+  ext <- tools::file_ext(filename)
+  switch(
+    ext,
+    csv = read_csv(filename, col_types = columnTypes),
+#                   col_types = list(
+#                    .default = col_double(),
+#                     Student = col_character(),
+#                     `SIS Login ID` = col_character(),
+#                     Section = col_character()
+#                   ),     #),
+    tsv = read_tsv(filename, col_types = columnTypes),
+    validate("Invalid file; Please upload a .csv file")
+  )
+}
+
 # get_grade_file <- function(filename) {
 #   ext <- tools::file_ext(filename$name)
 #   switch(

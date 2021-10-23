@@ -111,7 +111,9 @@ server <- function(input, output, session) {
 
   file163 <- reactive({
     req(input$choose163)
-    read_csv(input$choose163$datapath) %>% 
+    input$choose163$datapath %>%
+      purrr::map_dfr(~ get_grade_file(.x)) %>% 
+    #read_csv(input$choose163$datapath) %>% 
       filter(Student != "Points Possible")
   })
 
@@ -143,19 +145,30 @@ server <- function(input, output, session) {
 
   file063 <- reactive({
     req(input$choose063)
+    
+    column_types <- list(
+            .default = col_double(),
+             Student = col_character(),
+             `SIS Login ID` = col_character(),
+             Section = col_character()
+    )
 
     input$choose063$datapath %>%
       purrr::map_dfr(
-        ~ read_csv(
-          .x,
-          col_types = list(
-            .default = col_double(),
-            Student = col_character(),
-            `SIS Login ID` = col_character(),
-            Section = col_character()
-          )
-        )
-      ) %>%
+        ~ get_grade_file(
+          .x, 
+          columnTypes = column_types)) %>% 
+      # purrr::map_dfr(
+      #   ~ read_csv(
+      #     .x,
+      #     col_types = list(
+      #       .default = col_double(),
+      #       Student = col_character(),
+      #       `SIS Login ID` = col_character(),
+      #       Section = col_character()
+      #     )
+      #   )
+      # ) %>%
       filter(
         Student != "Points Possible"
       ) %>%
